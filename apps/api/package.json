@@ -1,0 +1,18 @@
+{
+  "name": "api",
+  "scripts": {
+    "dev": "nest start --watch"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.4",
+    "tsconfig": "workspace:*"
+  },
+  "dependencies": {
+    "@nestjs/common": "latest",
+    "@nestjs/core": "latest",
+    "@nestjs/platform-express": "latest",
+    "reflect-metadata": "latest",
+    "rxjs": "latest",
+    "@nestjs/testing": "latest"
+  }
+}

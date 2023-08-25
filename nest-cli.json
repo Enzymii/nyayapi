@@ -1,0 +1,29 @@
+{
+  "monorepo": true,
+  "root": "apps/my-turborepo",
+  "sourceRoot": "apps/my-turborepo/src",
+  "compilerOptions": {
+    "webpack": true,
+    "tsConfigPath": "apps/my-turborepo/tsconfig.app.json"
+  },
+  "projects": {
+    "my-turborepo": {
+      "type": "application",
+      "root": "apps/my-turborepo",
+      "entryFile": "main",
+      "sourceRoot": "apps/my-turborepo/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/my-turborepo/tsconfig.app.json"
+      }
+    },
+    "api": {
+      "type": "application",
+      "root": "apps/api",
+      "entryFile": "main",
+      "sourceRoot": "apps/api/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/api/tsconfig.app.json"
+      }
+    }
+  }
+}
