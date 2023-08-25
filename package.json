@@ -1,0 +1,45 @@
+{
+  "name": "my-turborepo",
+  "version": "0.0.1",
+  "scripts": {
+    "prepare": "husky install",
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint -- --fix",
+    "lint:staged": "lint-staged",
+    "doc": "turbo run doc",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "commit": "git-cz"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^17.7.1",
+    "@commitlint/config-conventional": "^17.7.0",
+    "@turbo/gen": "^1.9.7",
+    "commitizen": "^4.3.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^7.32.0",
+    "eslint-config-custom": "workspace:*",
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.0",
+    "prettier": "^2.5.1",
+    "turbo": "latest"
+  },
+  "packageManager": "pnpm@8.6.10",
+  "lint-staged": {
+    "packages/**/*.{ts,tsx}": [
+      "eslint --fix"
+    ],
+    "apps/**/*.{ts,tsx}": [
+      "eslint --fix"
+    ],
+    "*.{md, json}": [
+      "prettier --write"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
