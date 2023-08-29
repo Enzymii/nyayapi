@@ -1,0 +1,12 @@
+{
+  "extends": "tsconfig/base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "declaration": true,
+    "declarationMap": false,
+    "skipLibCheck": true,
+    "target": "ES5",
+    "moduleResolution": "classic"
+  },
+  "exclude": ["node_modules", "dist"]
+}

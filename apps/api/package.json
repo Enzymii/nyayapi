@@ -4,15 +4,21 @@
     "dev": "nest start --watch"
   },
   "devDependencies": {
+    "@types/express": "^4.17.17",
     "@types/jest": "^29.5.4",
-    "tsconfig": "workspace:*"
+    "tsconfig": "workspace:*",
+    "utils": "workspace:*"
   },
   "dependencies": {
     "@nestjs/common": "latest",
     "@nestjs/core": "latest",
     "@nestjs/platform-express": "latest",
+    "@nestjs/testing": "latest",
+    "@nestjs/typeorm": "^10.0.0",
+    "express": "^4.18.2",
+    "mysql2": "^3.6.0",
     "reflect-metadata": "latest",
     "rxjs": "latest",
-    "@nestjs/testing": "latest"
+    "typeorm": "^0.3.17"
   }
 }
