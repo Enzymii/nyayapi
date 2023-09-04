@@ -1,5 +1,8 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Req } from '@nestjs/common';
 import { ApiService } from './api.service';
+import { MyError } from 'utils';
+import { MyRequest } from 'express';
+import { JrrpResult } from './utils/resp.types';
 
 @Controller({
   version: '1',
@@ -10,5 +13,32 @@ export class ApiController {
   @Get()
   getHello(): string {
     return this.apiService.getHello();
+  }
+
+  @Get('jrrp')
+  async getJrrp(@Req() req: MyRequest): Promise<JrrpResult> {
+    try {
+      const oldJrrp = await this.apiService.checkJrrp(req);
+      if (oldJrrp > 0) {
+        return {
+          code: 0,
+          result: { jrrp: oldJrrp, got: 1 },
+        };
+      } else {
+        const result = this.apiService.newJrrp(req);
+        return {
+          code: 0,
+          result: { jrrp: await result, got: 0 },
+        };
+      }
+    } catch (error) {
+      const err = new MyError(2001, 'internal', '数据库异常');
+      MyError.log(err);
+
+      return {
+        code: err.code,
+        message: err.message,
+      };
+    }
   }
 }

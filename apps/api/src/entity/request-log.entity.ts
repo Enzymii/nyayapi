@@ -17,14 +17,17 @@ export class RequestLog {
   path!: string;
 
   @Column({ nullable: true })
-  fromId?: string;
-
-  @Column({ nullable: true })
-  fromPlatform?: string;
+  from?: string;
 
   @Column('text')
   params!: string;
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  @Column({ default: 0 })
+  resultCode!: number;
+
+  @Column({ nullable: true })
+  resultMessage?: string;
 }
