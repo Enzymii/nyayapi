@@ -71,18 +71,6 @@ export const MyDiceExpression = (
               cur = res.result;
               curt = `(${res.message})`;
               flag = true;
-
-              if (
-                subExp.indexOf('d') >= 0 &&
-                j < expression.length - 1 &&
-                expression[j + 1] === 'd'
-              ) {
-                return {
-                  isValid: false,
-                  result: NaN,
-                  message: '不可以嵌套掷骰',
-                };
-              }
             }
             i = j;
             break;
@@ -127,6 +115,12 @@ export const MyDiceExpression = (
       flag = false;
       stacks.num.push(cur);
       if (curt) {
+        if (
+          curt.indexOf('[') >= 0 &&
+          (stacks.op[stacks.op.length - 1] === 'd' || ch === 'd')
+        ) {
+          return { isValid: false, result: NaN, message: '不可以嵌套掷骰' };
+        }
         stacks.msg.push(curt);
         curt = '';
       } else {
@@ -223,7 +217,16 @@ export const MyDiceExpression = (
   }
 
   stacks.num.push(cur);
-  stacks.msg.push(cur.toString());
+  console.log('asdfasfd', curt);
+  if (curt) {
+    if (curt.indexOf('[') >= 0 && stacks.op[stacks.op.length - 1] === 'd') {
+      return { isValid: false, result: NaN, message: '不可以嵌套掷骰' };
+    }
+    stacks.msg.push(curt);
+    curt = '';
+  } else {
+    stacks.msg.push(cur.toString());
+  }
 
   while (stacks.op.length > 0) {
     if (stacks.num.length < 2) {
