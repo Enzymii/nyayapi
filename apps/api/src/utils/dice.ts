@@ -116,6 +116,7 @@ export const MyDiceExpression = (
       cur = 0;
 
       if (ch === '+' || ch === '-') {
+        lastD = false;
         while (
           stacks.op.length > 0 &&
           stacks.op[stacks.op.length - 1] !== '+' &&
@@ -171,6 +172,7 @@ export const MyDiceExpression = (
           }
         }
       } else if (ch === '*' || ch === '/') {
+        lastD = false;
         while (
           stacks.op.length > 0 &&
           stacks.op[stacks.op.length - 1] === 'd'
@@ -222,6 +224,7 @@ export const MyDiceExpression = (
     stacks.msg.push(cur.toString());
   }
 
+  lastD = false;
   while (stacks.op.length > 0) {
     if (stacks.num.length < 2) {
       return { isValid: false, result: NaN, message: '缺少运算数(总)' };
@@ -248,7 +251,6 @@ export const MyDiceExpression = (
       if (lastD) {
         return { isValid: false, result: NaN, message: '不可以嵌套掷骰' };
       }
-
       const dice = [];
       for (let i = 0; i < l; ++i) {
         const d = MyDiceD(r);
@@ -274,6 +276,10 @@ export const MyDiceExpression = (
   }
 
   if (isFinal) {
+    if (recordFunctions.length > 50) {
+      return { isValid: false, result: NaN, message: '骰子丢太多了！' };
+    }
+
     for (const func of recordFunctions) {
       func();
     }

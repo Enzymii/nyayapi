@@ -42,7 +42,10 @@ export class RequestLoggerInterceptor implements NestInterceptor {
         await this.entityManager.update(
           'request_log',
           { id: reqId },
-          { resultCode: data.code, resultMessage: stringifyResult(data) }
+          {
+            resultCode: data.code,
+            resultMessage: stringifyResult(data).slice(200),
+          }
         );
 
         return data;
