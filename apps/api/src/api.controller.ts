@@ -47,7 +47,9 @@ export class ApiController {
   async calcExpression(@Req() req: MyRequest): Promise<MyExpressionResult> {
     const { exp, s } = req.query;
 
-    const res = MyDiceExpression((exp as string) ?? 'd100', s === '1');
+    const res = MyDiceExpression((exp as string) ?? 'd100', s === '1', (v, m) =>
+      this.apiService.saveDiceRecord(req, v, m)
+    );
 
     if (res.isValid) {
       return { code: 0, result: res };

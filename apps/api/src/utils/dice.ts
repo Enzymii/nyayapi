@@ -11,32 +11,27 @@ export interface ExpressionResult {
   result: number;
   dices?: number[][];
   message: string;
+  recordFunctions?: (() => void)[];
 }
 export const MyDiceExpression = (
   expression: string,
   simplified = false,
+  recordFunc?: (val: number, max: number) => void,
   isFinal = true
 ): ExpressionResult => {
-  console.log(expression);
   const dices = [];
+
+  const recordFunctions = [];
 
   expression = expression.toLocaleLowerCase();
 
   if (!expression) {
-    return {
-      isValid: false,
-      result: NaN,
-      message: '空表达式',
-    };
+    return { isValid: false, result: NaN, message: '空表达式' };
   }
 
   const regex = /^[-+*/()d0-9]+$/;
   if (!regex.test(expression)) {
-    return {
-      isValid: false,
-      result: NaN,
-      message: '表达式包含非法字符',
-    };
+    return { isValid: false, result: NaN, message: '表达式包含非法字符' };
   }
 
   const stacks = {
@@ -62,7 +57,7 @@ export const MyDiceExpression = (
           --cnt;
           if (cnt === 0) {
             const subExp = expression.slice(i + 1, j);
-            const res = MyDiceExpression(subExp, simplified, false);
+            const res = MyDiceExpression(subExp, simplified, recordFunc, false);
             // merge the result
             if (!res.isValid) {
               return res;
@@ -71,6 +66,7 @@ export const MyDiceExpression = (
               cur = res.result;
               curt = `(${res.message})`;
               flag = true;
+              recordFunctions.push(...res.recordFunctions!);
             }
             i = j;
             break;
@@ -78,18 +74,10 @@ export const MyDiceExpression = (
         }
       }
       if (cnt !== 0) {
-        return {
-          isValid: false,
-          result: NaN,
-          message: '表达式中的括号不匹配',
-        };
+        return { isValid: false, result: NaN, message: '表达式中的括号不匹配' };
       }
     } else if (ch === ')') {
-      return {
-        isValid: false,
-        result: NaN,
-        message: '表达式中的括号不匹配',
-      };
+      return { isValid: false, result: NaN, message: '表达式中的括号不匹配' };
     } else if (ch >= '0' && ch <= '9') {
       if (curt) {
         return { isValid: false, result: NaN, message: '括号外不能直接跟数值' };
@@ -100,7 +88,6 @@ export const MyDiceExpression = (
     } else {
       if (!flag) {
         if (!(ch === 'd' || (ch === '-' && i === 0))) {
-          console.log(ch);
           return { isValid: false, result: NaN, message: '多余的运算符' };
         } else if (ch === 'd') {
           cur = 1;
@@ -150,7 +137,11 @@ export const MyDiceExpression = (
             stacks.msg.pop();
             const dice = [];
             for (let i = 0; i < l; ++i) {
-              dice.push(MyDiceD(r));
+              const d = MyDiceD(r);
+              if (recordFunc) {
+                recordFunctions.push(() => recordFunc(d, r));
+              }
+              dice.push(d);
             }
             dices.push(dice);
             const sum = dice.reduce((a, b) => a + b, 0);
@@ -198,7 +189,11 @@ export const MyDiceExpression = (
           stacks.msg.pop();
           const dice = [];
           for (let i = 0; i < l; ++i) {
-            dice.push(MyDiceD(r));
+            const d = MyDiceD(r);
+            if (recordFunc) {
+              recordFunctions.push(() => recordFunc(d, r));
+            }
+            dice.push(d);
           }
           dices.push(dice);
           const sum = dice.reduce((a, b) => a + b, 0);
@@ -217,7 +212,6 @@ export const MyDiceExpression = (
   }
 
   stacks.num.push(cur);
-  console.log('asdfasfd', curt);
   if (curt) {
     if (curt.indexOf('[') >= 0 && stacks.op[stacks.op.length - 1] === 'd') {
       return { isValid: false, result: NaN, message: '不可以嵌套掷骰' };
@@ -257,7 +251,11 @@ export const MyDiceExpression = (
 
       const dice = [];
       for (let i = 0; i < l; ++i) {
-        dice.push(MyDiceD(r));
+        const d = MyDiceD(r);
+        if (recordFunc) {
+          recordFunctions.push(() => recordFunc(d, r));
+        }
+        dice.push(d);
       }
       dices.push(dice);
       const sum = dice.reduce((a, b) => a + b, 0);
@@ -272,24 +270,27 @@ export const MyDiceExpression = (
   }
 
   if (stacks.num.length !== 1) {
-    return {
-      isValid: false,
-      result: NaN,
-      message: '多余的运算数',
-    };
+    return { isValid: false, result: NaN, message: '多余的运算数' };
   }
 
-  const resultMsg = isFinal
-    ? `${stacks.msg[0]} = ${stacks.num[0]}`
-    : stacks.msg[0];
+  if (isFinal) {
+    for (const func of recordFunctions) {
+      func();
+    }
 
-  return {
-    isValid: true,
-    result: stacks.num[0],
-    dices,
-    message: resultMsg,
-  };
+    return {
+      isValid: true,
+      result: stacks.num[0],
+      dices,
+      message: `${stacks.msg[0]} = ${stacks.num[0]}`,
+    };
+  } else {
+    return {
+      isValid: true,
+      result: stacks.num[0],
+      dices,
+      message: stacks.msg[0],
+      recordFunctions,
+    };
+  }
 };
-
-const test = MyDiceExpression('(1d2+5)*3d6', true);
-console.log(test);

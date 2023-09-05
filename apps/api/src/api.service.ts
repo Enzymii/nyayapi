@@ -3,6 +3,8 @@ import { EntityManager } from 'typeorm';
 import { Jrrp } from './entity/jrrp.entity';
 import { MyDiceD } from './utils/dice';
 import { MyRequest } from 'express';
+import { MyError } from 'utils';
+import { DiceRecord } from './entity/diceRecord.entity';
 
 @Injectable()
 export class ApiService {
@@ -44,5 +46,27 @@ export class ApiService {
     });
 
     return Promise.resolve(result);
+  }
+
+  async saveDiceRecord(
+    req: MyRequest,
+    val: number,
+    max: number
+  ): Promise<void> {
+    try {
+      await this.entityManager.insert<DiceRecord>('dice_record', {
+        userId: req.userId,
+        val: val,
+        max: max,
+      });
+    } catch (err) {
+      MyError.log(
+        new MyError(
+          2001,
+          'internal',
+          '保存骰子记录失败: ' + (err as Error).toString()
+        )
+      );
+    }
   }
 }
