@@ -2,7 +2,8 @@ import { Controller, Get, Req } from '@nestjs/common';
 import { ApiService } from './api.service';
 import { MyError } from 'utils';
 import { MyRequest } from 'express';
-import { JrrpResult } from './utils/resp.types';
+import { JrrpResult, MyExpressionResult } from './utils/resp.types';
+import { MyDiceExpression } from './utils/dice';
 
 @Controller({
   version: '1',
@@ -39,6 +40,20 @@ export class ApiController {
         code: err.code,
         message: err.message,
       };
+    }
+  }
+
+  @Get('d')
+  async calcExpression(@Req() req: MyRequest): Promise<MyExpressionResult> {
+    const { exp, s } = req.query;
+
+    const res = MyDiceExpression((exp as string) ?? 'd100', s === '1');
+
+    if (res.isValid) {
+      return { code: 0, result: res };
+    } else {
+      const { message } = res;
+      return { code: 1002, message: message ?? '表达式错误' };
     }
   }
 }
