@@ -5,6 +5,8 @@ import { MyDiceD } from './utils/dice';
 import { MyRequest } from 'express';
 import { MyError } from 'utils';
 import { DiceRecord } from './entity/diceRecord.entity';
+import { CocCharacter } from './entity/coc/character.entity';
+import { CocAttribute } from './entity/coc/attribute.entity';
 
 @Injectable()
 export class ApiService {
@@ -67,6 +69,65 @@ export class ApiService {
           '保存骰子记录失败: ' + (err as Error).toString()
         )
       );
+    }
+  }
+
+  async setCharacterAttribute(
+    req: MyRequest,
+    { name, value }: { name: string; value: number },
+    characterId?: number
+  ): Promise<number> {
+    try {
+      let character;
+
+      if (!characterId) {
+        character = await this.entityManager.findOne<CocCharacter>(
+          'coc_character',
+          { where: { creator: req.userId }, order: { id: 'DESC' } }
+        );
+
+        if (!character) {
+          character = new CocCharacter();
+          character.creator = req.userId;
+          await this.entityManager.insert<CocCharacter>(
+            'coc_character',
+            character
+          );
+        }
+      } else {
+        character = await this.entityManager.findOne<CocCharacter>(
+          'coc_character',
+          { where: { id: characterId } }
+        );
+
+        if (!character) {
+          MyError.log(new MyError(1003, 'api', '角色不存在'));
+          return Promise.reject(-1);
+        }
+      }
+
+      const target = await this.entityManager.findOne<CocAttribute>(
+        'coc_attribute',
+        { where: { character: { id: characterId }, name } }
+      );
+      if (target) {
+        target.value = value;
+        await this.entityManager.save(CocAttribute, target);
+      } else {
+        const attribute = new CocAttribute();
+        attribute.character = character;
+        attribute.name = name;
+        attribute.value = value;
+        await this.entityManager.insert<CocAttribute>(
+          'coc_attribute',
+          attribute
+        );
+      }
+
+      return character.id;
+    } catch (e) {
+      console.log(e);
+      throw new MyError(2001, 'internal', (e as Error).message);
     }
   }
 }

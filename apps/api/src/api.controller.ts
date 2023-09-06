@@ -1,8 +1,8 @@
-import { Controller, Get, Req } from '@nestjs/common';
+import { Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { ApiService } from './api.service';
 import { MyError } from 'utils';
 import { MyRequest } from 'express';
-import { JrrpResult, MyExpressionResult } from './utils/resp.types';
+import { ApiResult, JrrpResult, MyExpressionResult } from './utils/resp.types';
 import { MyDiceExpression } from './utils/dice';
 
 @Controller({
@@ -57,5 +57,52 @@ export class ApiController {
       const { message } = res;
       return { code: 1002, message: message ?? '表达式错误' };
     }
+  }
+
+  // @Post('set')
+  @Post('set/:characterId?')
+  async setCharacterAttribute(
+    @Req() req: MyRequest,
+    // eslint-disable-next-line @typescript-eslint/indent
+    @Param() param: { characterId: number }
+  ): Promise<ApiResult> {
+    const { values } = req.body;
+
+    return Promise.allSettled<number>(
+      values.map(([name, value]: [string, number]) =>
+        this.apiService.setCharacterAttribute(
+          req,
+          { name, value },
+          param.characterId
+        )
+      )
+    ).then((results) => {
+      if (results[0].status === 'rejected' && results[0].reason === -1) {
+        return { code: 1003, message: '角色不存在' };
+      }
+
+      const successIdList = results
+        .filter((r) => r.status === 'fulfilled')
+        .map((_, i) => i);
+
+      if (successIdList.length === 0) {
+        return { code: 2001, message: '数据库异常' };
+      }
+
+      const charaId =
+        param.characterId ??
+        (results[successIdList[0]] as PromiseFulfilledResult<number>).value;
+      const resp = {
+        code: 0,
+        result: {
+          ok: results.filter((r) => r.status === 'fulfilled').length,
+          error: results.filter((r) => r.status === 'rejected').length,
+          list: successIdList.map((i) => values[i][0]),
+        },
+        characterId: charaId,
+        message: 'ok',
+      };
+      return resp;
+    });
   }
 }
