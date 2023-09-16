@@ -4,6 +4,7 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { RequestLog } from '../entity/request-log.entity.js';
 import { EntityManager } from 'typeorm';
 import { MyError } from 'utils';
+import { allowed_origins } from '../entity/auth.entity.js';
 
 @Injectable()
 export class RequestLoggerMiddleware implements NestMiddleware {
@@ -16,9 +17,29 @@ export class RequestLoggerMiddleware implements NestMiddleware {
     requestLog.method = req.method;
     requestLog.path = '/' + req.params[0];
 
-    const { from, ...data } = req.query;
+    try {
+      const { authorization } = req.headers;
+
+      if (!authorization) {
+        throw new MyError(1004, 'api', '未知来源请求');
+      } else {
+        await this.entityManager.findOneOrFail(allowed_origins, {
+          where: { uuid: authorization },
+        });
+      }
+    } catch (e) {
+      const err = new MyError(1004, 'api', '验证请求来源失败');
+      MyError.log(err);
+      res.status(401).json({
+        code: err.code,
+        message: err.message,
+      });
+      return;
+    }
 
     try {
+      const { from, ...data } = req.query;
+
       if (from) {
         const parsed = Buffer.from(from as string, 'base64').toString('utf8');
 
@@ -33,6 +54,7 @@ export class RequestLoggerMiddleware implements NestMiddleware {
       requestLog.params = JSON.stringify({ ...data, ...req.body });
 
       req.userId = requestLog.from;
+      requestLog.origin = req.headers.authorization as string;
 
       await this.entityManager.save(RequestLog, requestLog);
 

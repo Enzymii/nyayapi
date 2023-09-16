@@ -30,4 +30,7 @@ export class RequestLog {
 
   @Column({ nullable: true })
   resultMessage?: string;
+
+  @Column()
+  origin!: string;
 }
