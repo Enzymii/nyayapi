@@ -2,8 +2,14 @@ import { Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { ApiService } from './api.service';
 import { MyError } from 'utils';
 import { MyRequest } from 'express';
-import { ApiResult, JrrpResult, MyExpressionResult } from './utils/resp.types';
+import {
+  ApiResult,
+  CocAttributeResult,
+  JrrpResult,
+  MyExpressionResult,
+} from './types/resp.types';
 import { MyDiceExpression } from './utils/dice';
+import { attributeDices } from './utils/cocRules';
 
 @Controller({
   version: '1',
@@ -56,6 +62,43 @@ export class ApiController {
     } else {
       const { message } = res;
       return { code: 1002, message: message ?? '表达式错误' };
+    }
+  }
+
+  @Get('coc7')
+  async getCocAttribute(@Req() req: MyRequest): Promise<CocAttributeResult> {
+    const { num } = req.query;
+
+    try {
+      if ((num && isNaN(Number(num))) || Number(num) > 5) {
+        throw new MyError(1002, 'api', '生成的属性数不合法');
+      }
+
+      const result = new Array(Number(num) ?? 1).fill(0).map(() => {
+        const res: Record<string, number> = {};
+
+        for (const key in attributeDices) {
+          res[key] = MyDiceExpression(
+            attributeDices[key as keyof typeof attributeDices],
+            true,
+            (v, m) => {
+              this.apiService.saveDiceRecord(req, v, m);
+            }
+          ).result;
+        }
+
+        return res;
+      });
+
+      return { code: 0, result };
+    } catch (e) {
+      if ((e as MyError).isCustomError) {
+        const err = e as MyError;
+        return { code: err.code, message: err.message };
+      } else {
+        console.log(e);
+        return { code: 2001, message: '数据库异常' };
+      }
     }
   }
 

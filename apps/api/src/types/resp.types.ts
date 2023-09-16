@@ -1,4 +1,4 @@
-import { ExpressionResult } from './dice';
+import { ExpressionResult } from '../utils/dice';
 
 interface ApiResultSuccess<T> {
   code: 0;
@@ -16,6 +16,8 @@ export type ApiResult<T = unknown> = ApiResultSuccess<T> | ApiResultError;
 export type JrrpResult = ApiResult<{ jrrp: number; got: 0 | 1 }>;
 
 export type MyExpressionResult = ApiResult<ExpressionResult>;
+
+export type CocAttributeResult = ApiResult<Record<string, number>[]>;
 
 export const isResultSuccess = (
   result: ApiResult

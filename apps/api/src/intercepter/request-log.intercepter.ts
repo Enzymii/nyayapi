@@ -8,7 +8,7 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { MyRequest } from 'express';
 import { Observable, map } from 'rxjs';
 import { EntityManager } from 'typeorm';
-import { ApiResult, isResultSuccess } from '../utils/resp.types';
+import { ApiResult, isResultSuccess } from '../types/resp.types';
 
 @Injectable()
 export class RequestLoggerInterceptor implements NestInterceptor {
