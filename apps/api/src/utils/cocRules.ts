@@ -9,3 +9,9 @@ export const attributeDices = {
   EDU: '(2d6+6)*5',
   LUK: '3d6*5',
 };
+
+export const isAttribute = (
+  key: string
+): key is keyof typeof attributeDices => {
+  return key in attributeDices;
+};

@@ -7,6 +7,7 @@ import { MyError } from 'utils';
 import { DiceRecord } from './entity/diceRecord.entity';
 import { CocCharacter } from './entity/coc/character.entity';
 import { CocAttribute } from './entity/coc/attribute.entity';
+import { CocSkill } from './entity/coc/skill.entity';
 
 @Injectable()
 export class ApiService {
@@ -108,7 +109,7 @@ export class ApiService {
 
       const target = await this.entityManager.findOne<CocAttribute>(
         'coc_attribute',
-        { where: { character: { id: characterId }, name } }
+        { where: { character: { id: character.id }, name } }
       );
       if (target) {
         target.value = value;
@@ -122,6 +123,59 @@ export class ApiService {
           'coc_attribute',
           attribute
         );
+      }
+
+      return character.id;
+    } catch (e) {
+      console.log(e);
+      throw new MyError(2001, 'internal', (e as Error).message);
+    }
+  }
+
+  async setCharacterSkill(
+    req: MyRequest,
+    value: CocSkill,
+    characterId?: number
+  ): Promise<number> {
+    try {
+      let character;
+
+      if (!characterId) {
+        character = await this.entityManager.findOne<CocCharacter>(
+          'coc_character',
+          { where: { creator: req.userId }, order: { id: 'DESC' } }
+        );
+
+        if (!character) {
+          character = new CocCharacter();
+          character.creator = req.userId;
+          await this.entityManager.insert<CocCharacter>(
+            'coc_character',
+            character
+          );
+        }
+      } else {
+        character = await this.entityManager.findOne<CocCharacter>(
+          'coc_character',
+          { where: { id: characterId } }
+        );
+
+        if (!character) {
+          MyError.log(new MyError(1003, 'api', '角色不存在'));
+          return Promise.reject(-1);
+        }
+      }
+
+      const target = await this.entityManager.findOne<CocSkill>('coc_skill', {
+        where: { character: { id: character.id }, name: value.name },
+      });
+      if (target) {
+        await this.entityManager.save(CocSkill, { ...target, ...value });
+      } else {
+        await this.entityManager.insert<CocSkill>('coc_skill', {
+          ...value,
+          character,
+        });
       }
 
       return character.id;

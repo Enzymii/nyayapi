@@ -9,7 +9,8 @@ import {
   MyExpressionResult,
 } from './types/resp.types';
 import { MyDiceExpression } from './utils/dice';
-import { attributeDices } from './utils/cocRules';
+import { attributeDices, isAttribute } from './utils/cocRules';
+import { CocSkill } from './entity/coc/skill.entity';
 
 @Controller({
   version: '1',
@@ -112,12 +113,22 @@ export class ApiController {
     const { values } = req.body;
 
     return Promise.allSettled<number>(
-      values.map(([name, value]: [string, number]) =>
-        this.apiService.setCharacterAttribute(
-          req,
-          { name, value },
-          param.characterId
-        )
+      values.map(
+        (value: { name: string } & Record<string, number | string>) => {
+          if (isAttribute(value.name)) {
+            return this.apiService.setCharacterAttribute(
+              req,
+              { name: value.name, value: value.value as number },
+              param.characterId
+            );
+          } else {
+            return this.apiService.setCharacterSkill(
+              req,
+              value as unknown as CocSkill,
+              param.characterId
+            );
+          }
+        }
       )
     ).then((results) => {
       if (results[0].status === 'rejected' && results[0].reason === -1) {
@@ -140,7 +151,7 @@ export class ApiController {
         result: {
           ok: results.filter((r) => r.status === 'fulfilled').length,
           error: results.filter((r) => r.status === 'rejected').length,
-          list: successIdList.map((i) => values[i][0]),
+          list: successIdList.map((i) => values[i].name),
         },
         characterId: charaId,
         message: 'ok',

@@ -5,9 +5,10 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { CocCharacter } from './character.entity';
 
 @Entity()
-@Index(['name', 'characterId'])
+@Index(['name', 'character'])
 export class CocSkill {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -28,6 +29,6 @@ export class CocSkill {
   @Column({ nullable: true, default: 0 })
   interest?: number; // can be also added by these three
 
-  @ManyToOne(() => CocSkill, (skill) => skill.characterId)
-  characterId!: number;
+  @ManyToOne(() => CocSkill, (skill) => skill.character)
+  character!: CocCharacter;
 }
