@@ -15,3 +15,28 @@ export const isAttribute = (
 ): key is keyof typeof attributeDices => {
   return key in attributeDices;
 };
+
+type CocSuccessType =
+  | 'critical'
+  | 'extreme'
+  | 'hard'
+  | 'normal'
+  | 'fail'
+  | 'fumble';
+
+export class CocCheckResult {
+  constructor(
+    public success: CocSuccessType,
+    public result: number,
+    public value: number
+  ) {}
+
+  get isSuccess() {
+    return (
+      this.success === 'critical' ||
+      this.success === 'extreme' ||
+      this.success === 'hard' ||
+      this.success === 'normal'
+    );
+  }
+}

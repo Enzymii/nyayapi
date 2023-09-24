@@ -9,7 +9,7 @@ import {
   MyExpressionResult,
 } from './types/resp.types';
 import { MyDiceExpression } from './utils/dice';
-import { attributeDices, isAttribute } from './utils/cocRules';
+import { CocCheckResult, attributeDices, isAttribute } from './utils/cocRules';
 import { CocSkill } from './entity/coc/skill.entity';
 
 @Controller({
@@ -98,6 +98,28 @@ export class ApiController {
         return { code: err.code, message: err.message };
       } else {
         console.log(e);
+        return { code: 2001, message: '数据库异常' };
+      }
+    }
+  }
+
+  @Get('check')
+  async checkCharacterAttribute(
+    @Req() req: MyRequest
+  ): Promise<ApiResult<CocCheckResult>> {
+    const { name, value, bonus } = req.query;
+    try {
+      const res = await this.apiService.cocCheck(req, {
+        name: name as string,
+        value: Number(value),
+        bonus: Number(bonus),
+      });
+      return { code: 0, result: res };
+    } catch (e) {
+      if ((e as MyError).isCustomError) {
+        MyError.log(e as MyError);
+        return { code: (e as MyError).code, message: (e as MyError).message };
+      } else {
         return { code: 2001, message: '数据库异常' };
       }
     }

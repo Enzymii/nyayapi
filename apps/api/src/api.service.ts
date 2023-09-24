@@ -8,6 +8,7 @@ import { DiceRecord } from './entity/diceRecord.entity';
 import { CocCharacter } from './entity/coc/character.entity';
 import { CocAttribute } from './entity/coc/attribute.entity';
 import { CocSkill } from './entity/coc/skill.entity';
+import { CocCheckResult, isAttribute } from './utils/cocRules';
 
 @Injectable()
 export class ApiService {
@@ -181,6 +182,109 @@ export class ApiService {
       return character.id;
     } catch (e) {
       console.log(e);
+      throw new MyError(2001, 'internal', (e as Error).message);
+    }
+  }
+
+  async cocCheck(
+    req: MyRequest,
+    { name, value, bonus }: { name: string; value?: number; bonus?: number }
+  ): Promise<CocCheckResult> {
+    try {
+      let realValue = value;
+      if (!realValue) {
+        if (isAttribute(name)) {
+          const characters = await this.entityManager.find<CocCharacter>(
+            'coc_character',
+            { where: { creator: req.userId }, order: { id: 'DESC' } }
+          );
+
+          for (const character of characters) {
+            const attribute = await this.entityManager.findOne<CocAttribute>(
+              'coc_attribute',
+              {
+                where: { character: { id: character.id }, name },
+                order: { id: 'DESC' },
+              }
+            );
+
+            if (attribute) {
+              realValue = attribute.value!;
+              break;
+            }
+          }
+          if (!realValue) {
+            throw new MyError(1003, 'api', '属性值未设置');
+          }
+        } else {
+          const characters = await this.entityManager.find<CocCharacter>(
+            'coc_character',
+            { where: { creator: req.userId }, order: { id: 'DESC' } }
+          );
+
+          for (const character of characters) {
+            const skill = await this.entityManager.findOne<CocSkill>(
+              'coc_skill',
+              {
+                where: { character: { id: character.id }, name },
+                order: { id: 'DESC' },
+              }
+            );
+
+            if (skill) {
+              if (skill.value) {
+                realValue = skill.value;
+              } else {
+                realValue =
+                  (skill.enhancement ?? 0) +
+                  (skill.profession ?? 0) +
+                  (skill.interest ?? 0);
+              }
+              break;
+            }
+          }
+          if (!realValue) {
+            throw new MyError(1003, 'api', '技能值未设置');
+          }
+        }
+      }
+
+      let result = MyDiceD(100);
+      let bd: number[] = [];
+      this.saveDiceRecord(req, result, 100);
+      const t = result % 10;
+
+      if (bonus) {
+        const bLen = Math.floor(Math.abs(bonus));
+        if (bLen > 3) {
+          throw new MyError(1002, 'api', '奖励骰数量过多');
+        }
+        bd = new Array(bLen).fill(0).map(() => MyDiceD(10));
+        bd.forEach((v) => this.saveDiceRecord(req, v, 10));
+        result = bd.reduce((a, b) => {
+          if (bonus > 0) {
+            return Math.min((a - 1) * 10 + t, (b - 1) * 10 + t);
+          } else {
+            return Math.max((a - 1) * 10 + t, (b - 1) * 10 + t);
+          }
+        }, result);
+      }
+
+      // check result according to coc rule book
+      if (result === 1) {
+        return new CocCheckResult('critical', result, realValue);
+      } else if (result > 99 || (result > 95 && realValue < 50)) {
+        return new CocCheckResult('fumble', result, realValue);
+      } else if (result <= realValue / 5) {
+        return new CocCheckResult('extreme', result, realValue);
+      } else if (result <= realValue / 2) {
+        return new CocCheckResult('hard', result, realValue);
+      } else if (result <= realValue) {
+        return new CocCheckResult('normal', result, realValue);
+      } else {
+        return new CocCheckResult('fail', result, realValue);
+      }
+    } catch (e) {
       throw new MyError(2001, 'internal', (e as Error).message);
     }
   }
