@@ -2,18 +2,19 @@
   "name": "bot-qq",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "dev": "tsc && node dist/index"
+    "dev": "ts-node index.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "qq-message-handler": "workspace:*",
+    "ts-node": "^10.9.1",
     "tsconfig": "workspace:*"
   },
   "dependencies": {
-    "mirainya2": "^1.2.0",
-    "qq-message-handler": "workspace:*"
+    "mirainya2": "^1.2.0"
   }
 }
