@@ -1,0 +1,19 @@
+{
+  "name": "qq-message-handler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "dev": "tsc && node dist/index"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tsconfig": "workspace:*"
+  },
+  "dependencies": {
+    "axios": "^1.5.1",
+    "mirainya2": "^1.2.0"
+  }
+}

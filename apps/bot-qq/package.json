@@ -1,0 +1,18 @@
+{
+  "name": "bot-qq",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsc && node dist/index"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tsconfig": "workspace:*"
+  },
+  "dependencies": {
+    "mirainya2": "^1.2.0"
+  }
+}
