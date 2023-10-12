@@ -1,4 +1,5 @@
-import { Bot, Logger, MakeMsg, recvIsMessage } from 'mirainya2';
+import { Bot, Logger, recvIsMessage } from 'mirainya2';
+import { QQMessageHandler } from 'qq-message-handler';
 import { botConfig } from './config/bot-config';
 
 const main = async () => {
@@ -7,13 +8,12 @@ const main = async () => {
 
     await bot.login();
 
+    const handler = new QQMessageHandler(bot);
+
     bot.listen((recv) => {
       if (recvIsMessage(recv)) {
         Logger.log(JSON.stringify(recv));
-        bot.api.sendFriendMessage(recv.sender.id, [
-          MakeMsg.plain('hello world'),
-        ]);
-        console.log(recv);
+        handler.handle(recv);
       }
     });
   } catch (e) {

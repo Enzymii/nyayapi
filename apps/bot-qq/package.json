@@ -13,6 +13,7 @@
     "tsconfig": "workspace:*"
   },
   "dependencies": {
-    "mirainya2": "^1.2.0"
+    "mirainya2": "^1.2.0",
+    "qq-message-handler": "workspace:*"
   }
 }

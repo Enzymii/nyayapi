@@ -100,6 +100,9 @@ importers:
       mirainya2:
         specifier: ^1.2.0
         version: 1.2.0
+      qq-message-handler:
+        specifier: workspace:*
+        version: link:../../packages/qq-message-handler
     devDependencies:
       tsconfig:
         specifier: workspace:*

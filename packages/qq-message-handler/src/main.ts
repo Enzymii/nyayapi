@@ -22,10 +22,29 @@ export class QQMessageHandler {
 
       const textMsgs = messageChain.filter((msg) => msg.type === 'Plain');
 
-      textMsgs.forEach((text) =>
-        this.handleText(text as PlainMessage, {
-          qq: recv.sender.id,
-          group: (recv as GroupMessageChain).sender.group,
+      Promise.all(
+        textMsgs.map(async (text) => {
+          const replyMsg = await this.handleText(text as PlainMessage, {
+            qq: recv.sender.id,
+            group: (recv as GroupMessageChain).sender.group,
+          });
+
+          if (replyMsg) {
+            const reply = replyMsg instanceof Array ? replyMsg : [replyMsg];
+            if (recv.type === 'GroupMessage') {
+              this.bot.api.sendGroupMessage(recv.sender.group.id, reply);
+            } else if (recv.type === 'FriendMessage') {
+              this.bot.api.sendFriendMessage(recv.sender.id, reply);
+            } else if (recv.type === 'TempMessage') {
+              this.bot.api.sendTempMessage(
+                recv.sender.group.id,
+                recv.sender.id,
+                reply
+              );
+            } else {
+              throw new Error('unsupported message type');
+            }
+          }
         })
       );
     } else {

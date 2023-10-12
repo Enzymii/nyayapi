@@ -1,1 +1,1 @@
-export class QQMessageHandler {}
+export * from './src/main';
