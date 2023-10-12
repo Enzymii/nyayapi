@@ -1,4 +1,4 @@
-import Axios from 'axios';
+import Axios, { AxiosResponse } from 'axios';
 import { apiConfig } from '../config/api-config';
 
 export class MyRequest {
@@ -33,7 +33,11 @@ export class MyRequest {
         data,
       });
     } catch (e) {
-      console.log(e);
+      if ((e as AxiosResponse).data) {
+        console.log((e as AxiosResponse).data);
+      } else {
+        console.log(e);
+      }
     }
   }
 }

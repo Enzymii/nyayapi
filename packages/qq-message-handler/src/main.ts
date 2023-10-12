@@ -1,7 +1,7 @@
-import { Bot, MakeMsg, RecvType, recvIsMessage } from 'mirainya2';
+import { Bot, Logger, MakeMsg, RecvType, recvIsMessage } from 'mirainya2';
 import type {
-  GroupInfo,
-  GroupMessageChain,
+  FriendInfo,
+  MemberProfile,
   Message,
   MessageChain,
   PlainMessage,
@@ -24,9 +24,15 @@ export class QQMessageHandler {
 
       Promise.all(
         textMsgs.map(async (text) => {
+          const nickname =
+            (recv.sender as MemberProfile).memberName ||
+            (recv.sender as FriendInfo).nickname ||
+            `[${recv.sender.id}]`;
+
           const replyMsg = await this.handleText(text as PlainMessage, {
             qq: recv.sender.id,
-            group: (recv as GroupMessageChain).sender.group,
+            group: (recv.sender as MemberProfile).group.id,
+            nickname,
           });
 
           if (replyMsg) {
@@ -54,14 +60,14 @@ export class QQMessageHandler {
 
   private async handleText(
     msg: PlainMessage,
-    sender: { qq: number; group?: GroupInfo }
+    sender: { qq: number; group?: number; nickname: string }
   ): Promise<Message | MessageChain | null> {
     // TODO: do something to text, should be returned by a MakeMsg function
     const { text } = msg;
     const text2 = text
       .trim()
       .replace(/^。/, '.')
-      .replaceAll(/\s/, ' ')
+      .replaceAll(/\s/g, ' ')
       .toLocaleLowerCase();
 
     if (/^\.\s*[a-z0-9]+/.test(text2)) {
@@ -75,18 +81,26 @@ export class QQMessageHandler {
           return MakeMsg.plain(responseTranslator('pong'));
         }
         case '.jrrp': {
-          const data = (
-            await this.req.request({
+          try {
+            const res = await this.req.request({
               method: 'GET',
               url: '/jrrp',
               qq: sender.qq,
-            })
-          )?.data;
-
-          return MakeMsg.plain(responseTranslator('jrrp', data.jrrp));
+            });
+            if (!res) {
+              throw new Error('获取jrrp值失败');
+            }
+            return MakeMsg.plain(
+              responseTranslator('jrrp', sender.nickname, res.data.result.jrrp)
+            );
+          } catch (e) {
+            Logger.log('获取jrrp值失败');
+            break;
+          }
         }
         default:
-          return MakeMsg.plain('unknown command');
+          Logger.log('未知的指令：' + order);
+          return null;
       }
     }
 
