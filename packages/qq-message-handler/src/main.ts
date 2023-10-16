@@ -72,7 +72,6 @@ export class QQMessageHandler {
 
     if (/^\.\s*[a-z0-9]+/.test(text2)) {
       // order messages
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [order, ...args] = text2.split(' ');
 
       switch (order) {
@@ -111,9 +110,12 @@ export class QQMessageHandler {
               throw new Error('掷骰请求失败');
             }
             const { result } = res.data;
-            if (!result.isValid) {
+            if (!result || !result.isValid) {
               return MakeMsg.plain(
-                responseTranslator('dice-error', result.message)
+                responseTranslator(
+                  'dice-error',
+                  result ? result.message : res.data.message
+                )
               );
             }
             return MakeMsg.plain(
