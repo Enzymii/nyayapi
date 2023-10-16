@@ -6,7 +6,7 @@ import type {
   MessageChain,
   PlainMessage,
 } from 'mirainya2';
-import { responseTranslator } from './response/response';
+import { responseTranslator } from './response';
 import { MyRequest } from './requests';
 
 export class QQMessageHandler {
@@ -31,7 +31,7 @@ export class QQMessageHandler {
 
           const replyMsg = await this.handleText(text as PlainMessage, {
             qq: recv.sender.id,
-            group: (recv.sender as MemberProfile).group.id,
+            group: (recv.sender as MemberProfile).group?.id,
             nickname,
           });
 

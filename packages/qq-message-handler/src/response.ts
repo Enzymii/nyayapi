@@ -1,5 +1,5 @@
-import { apiConfig } from '../../config/api-config';
-import { official as responseMap } from './response.json';
+import { apiConfig } from '../config/api-config';
+import { official as responseMap } from './response/response.json';
 
 export const responseTranslator = (respName: string, ...respArgs: string[]) => {
   const res = responseMap.find((resp) => resp.name === respName);
