@@ -76,8 +76,7 @@ export class QQMessageHandler {
       const [order, ...args] = text2.split(' ');
 
       switch (order) {
-        case '.ping':
-        case '。ping': {
+        case '.ping': {
           return MakeMsg.plain(responseTranslator('pong'));
         }
         case '.jrrp': {
@@ -95,12 +94,39 @@ export class QQMessageHandler {
             );
           } catch (e) {
             Logger.log('获取jrrp值失败');
-            break;
+            console.log(e);
+            return MakeMsg.plain(responseTranslator('internal-error'));
+          }
+        }
+        case '.r':
+        case '.rs': {
+          try {
+            const res = await this.req.request({
+              method: 'GET',
+              url: '/d',
+              qq: sender.qq,
+              params: { exp: args[0], s: order === '.rs' },
+            });
+            if (!res) {
+              throw new Error('掷骰请求失败');
+            }
+            const { result } = res.data;
+            if (!result.isValid) {
+              return MakeMsg.plain(
+                responseTranslator('dice-error', result.message)
+              );
+            }
+            return MakeMsg.plain(
+              responseTranslator('dice', sender.nickname, result.message)
+            );
+          } catch (e) {
+            Logger.log('掷骰请求失败');
+            console.log(e);
+            return MakeMsg.plain(responseTranslator('internal-error'));
           }
         }
         default:
           Logger.log('未知的指令：' + order);
-          return null;
       }
     }
 

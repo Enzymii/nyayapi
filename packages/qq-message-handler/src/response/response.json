@@ -1,0 +1,24 @@
+{
+  "official": [
+    { "name": "pong", "content": "$$在喵w~" },
+    {
+      "name": "jrrp",
+      "content": "$$猜测$0的今日人品为$1喵w~$2",
+      "params": ["username", "jrrp", "description"]
+    },
+    {
+      "name": "dice",
+      "content": "来看看$$为$0掷出的结果喵w: $1",
+      "params": ["username", "dice text"]
+    },
+    {
+      "name": "dice-error",
+      "content": "$$觉得不可以这么骰喵w：$0",
+      "params": ["error message"]
+    },
+    {
+      "name": "interal-error",
+      "content": "$$要休息一会喵w~ 请过一会再来找$$玩喵w~"
+    }
+  ]
+}
