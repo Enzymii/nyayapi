@@ -22,7 +22,7 @@
       "params": ["username", "coc text"]
     },
     {
-      "name": "interal-error",
+      "name": "internal-error",
       "content": "$$要休息一会喵w~ 请过一会再来找$$玩喵w~"
     }
   ]

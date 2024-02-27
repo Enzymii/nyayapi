@@ -132,7 +132,7 @@ export class QQMessageHandler {
           try {
             const res = await this.req.request({
               method: 'GET',
-              url: '/coc',
+              url: '/coc7',
               qq: sender.qq,
               params: { num: args[0] },
             });
