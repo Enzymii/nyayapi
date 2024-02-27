@@ -127,6 +127,40 @@ export class QQMessageHandler {
             return MakeMsg.plain(responseTranslator('internal-error'));
           }
         }
+        case '.coc':
+        case '.coc7': {
+          try {
+            const res = await this.req.request({
+              method: 'GET',
+              url: '/coc',
+              qq: sender.qq,
+              params: { num: args[0] },
+            });
+            if (!res) {
+              throw new Error('coc检定请求失败');
+            }
+            const { result } = res.data;
+            if (!result) {
+              return MakeMsg.plain(responseTranslator('internal-error'));
+            }
+
+            const text = result.map((res: Record<string, number | string>) => {
+              let t = '';
+              for (const k in res) {
+                t += `${k}: ${res[k]} `;
+              }
+              return t;
+            });
+
+            return MakeMsg.plain(
+              responseTranslator('coc', sender.nickname, text.join('\n'))
+            );
+          } catch (e) {
+            Logger.log('coc检定请求失败');
+            console.log(e);
+            return MakeMsg.plain(responseTranslator('internal-error'));
+          }
+        }
         default:
           Logger.log('未知的指令：' + order);
       }

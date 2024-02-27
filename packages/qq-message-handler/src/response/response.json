@@ -17,6 +17,11 @@
       "params": ["error message"]
     },
     {
+      "name": "coc",
+      "content": "来看看$$为$0准备的COC7人物作成结果喵w：\n$1",
+      "params": ["username", "coc text"]
+    },
+    {
       "name": "interal-error",
       "content": "$$要休息一会喵w~ 请过一会再来找$$玩喵w~"
     }

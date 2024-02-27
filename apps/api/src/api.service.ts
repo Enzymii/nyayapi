@@ -8,7 +8,11 @@ import { DiceRecord } from './entity/diceRecord.entity';
 import { CocCharacter } from './entity/coc/character.entity';
 import { CocAttribute } from './entity/coc/attribute.entity';
 import { CocSkill } from './entity/coc/skill.entity';
-import { CocCheckResult, isAttribute } from './utils/cocRules';
+import {
+  CocCheckResult,
+  CocRuleBookCheck,
+  isAttribute,
+} from './utils/cocRules';
 
 @Injectable()
 export class ApiService {
@@ -249,41 +253,15 @@ export class ApiService {
         }
       }
 
-      let result = MyDiceD(100);
-      let bd: number[] = [];
-      this.saveDiceRecord(req, result, 100);
-      const t = result % 10;
-
-      if (bonus) {
-        const bLen = Math.floor(Math.abs(bonus));
-        if (bLen > 3) {
-          throw new MyError(1002, 'api', '奖励骰数量过多');
-        }
-        bd = new Array(bLen).fill(0).map(() => MyDiceD(10));
-        bd.forEach((v) => this.saveDiceRecord(req, v, 10));
-        result = bd.reduce((a, b) => {
-          if (bonus > 0) {
-            return Math.min((a - 1) * 10 + t, (b - 1) * 10 + t);
-          } else {
-            return Math.max((a - 1) * 10 + t, (b - 1) * 10 + t);
-          }
-        }, result);
-      }
-
       // check result according to coc rule book
-      if (result === 1) {
-        return new CocCheckResult('critical', result, realValue);
-      } else if (result > 99 || (result > 95 && realValue < 50)) {
-        return new CocCheckResult('fumble', result, realValue);
-      } else if (result <= realValue / 5) {
-        return new CocCheckResult('extreme', result, realValue);
-      } else if (result <= realValue / 2) {
-        return new CocCheckResult('hard', result, realValue);
-      } else if (result <= realValue) {
-        return new CocCheckResult('normal', result, realValue);
-      } else {
-        return new CocCheckResult('fail', result, realValue);
-      }
+      const checkRule = new CocRuleBookCheck();
+      // TODO: add more rules, maybe rule switcher
+
+      return checkRule.check({
+        target: realValue,
+        bonus: bonus ?? 0,
+        saver: (v, m) => this.saveDiceRecord(req, v, m),
+      });
     } catch (e) {
       throw new MyError(2001, 'internal', (e as Error).message);
     }
