@@ -44,7 +44,7 @@ export class RequestLoggerInterceptor implements NestInterceptor {
           { id: reqId },
           {
             resultCode: data.code,
-            resultMessage: stringifyResult(data).slice(200),
+            resultMessage: stringifyResult(data).slice(0, 200),
           }
         );
 
