@@ -28,7 +28,7 @@
     },
     {
       "name": "param-error",
-      "content": "$$觉得这样不可以喵w：$1",
+      "content": "$$觉得这样不可以喵w：$0",
       "params": ["error message"]
     },
     {
