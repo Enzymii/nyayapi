@@ -115,7 +115,7 @@ export class ApiController {
 
       const result = new Array(Number(num) || 1).fill(0).map(() => {
         const res = new Array(6).fill(0).map(() => {
-          const dices = MyDiceExpression('d6', true, (v, m) => {
+          const dices = MyDiceExpression('4d6', true, (v, m) => {
             this.apiService.saveDiceRecord(req, v, m);
           });
 
@@ -124,7 +124,7 @@ export class ApiController {
           } else {
             const resDices = dices.dices![0];
 
-            const sum = resDices
+            const sum = [...resDices]
               .sort((a, b) => a - b)
               .slice(1)
               .reduce((a, b) => a + b, 0);
