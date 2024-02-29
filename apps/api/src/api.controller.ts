@@ -75,7 +75,7 @@ export class ApiController {
         throw new MyError(1002, 'api', '生成的属性数不合法');
       }
 
-      const result = new Array(Number(num) ?? 1).fill(0).map(() => {
+      const result = new Array(Number(num) || 1).fill(0).map(() => {
         const res: Record<string, number> = {};
 
         for (const key in attributeDices) {
