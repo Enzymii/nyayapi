@@ -5,6 +5,7 @@ import { MyRequest } from 'express';
 import {
   ApiResult,
   CocAttributeResult,
+  DndAttributeResult,
   JrrpResult,
   MyExpressionResult,
 } from './types/resp.types';
@@ -87,6 +88,50 @@ export class ApiController {
             }
           ).result;
         }
+
+        return res;
+      });
+
+      return { code: 0, result };
+    } catch (e) {
+      if ((e as MyError).isCustomError) {
+        const err = e as MyError;
+        return { code: err.code, message: err.message };
+      } else {
+        console.log(e);
+        return { code: 2001, message: '数据库异常' };
+      }
+    }
+  }
+
+  @Get('dnd')
+  async getDndAttribute(@Req() req: MyRequest): Promise<DndAttributeResult> {
+    const { num } = req.query;
+
+    try {
+      if ((num && isNaN(Number(num))) || Number(num) > 5) {
+        throw new MyError(1002, 'api', '生成的属性数不合法');
+      }
+
+      const result = new Array(Number(num) || 1).fill(0).map(() => {
+        const res = new Array(6).fill(0).map(() => {
+          const dices = MyDiceExpression('d6', true, (v, m) => {
+            this.apiService.saveDiceRecord(req, v, m);
+          });
+
+          if (!dices.isValid) {
+            throw new MyError(1002, 'api', '生成属性值失败');
+          } else {
+            const resDices = dices.dices![0];
+
+            const sum = resDices
+              .sort((a, b) => a - b)
+              .slice(1)
+              .reduce((a, b) => a + b, 0);
+
+            return { sum, dices: resDices };
+          }
+        });
 
         return res;
       });

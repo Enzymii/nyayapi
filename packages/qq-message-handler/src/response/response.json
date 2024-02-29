@@ -22,8 +22,18 @@
       "params": ["username", "coc text"]
     },
     {
+      "name": "dnd",
+      "content": "来看看$$为$0准备的DND人物作成结果喵w：\n$1",
+      "params": ["username", "dnd text"]
+    },
+    {
+      "name": "param-error",
+      "content": "$$觉得这样不可以喵w：$1",
+      "params": ["error message"]
+    },
+    {
       "name": "internal-error",
-      "content": "$$要休息一会喵w~ 请过一会再来找$$玩喵w~"
+      "content": "$$感觉不太对劲喵w~ 请过一会再来找$$玩喵w~"
     }
   ]
 }

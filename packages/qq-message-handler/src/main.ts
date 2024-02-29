@@ -139,11 +139,14 @@ export class QQMessageHandler {
             if (!res) {
               throw new Error('coc检定请求失败');
             }
-            const { result } = res.data;
-            if (!result) {
-              return MakeMsg.plain(responseTranslator('internal-error'));
+            if (res.data.code !== 0) {
+              Logger.log('coc检定请求失败');
+              console.log(res.data.message);
+              return MakeMsg.plain(
+                responseTranslator('param-error', res.data.message)
+              );
             }
-
+            const { result } = res.data;
             const text = result.map((res: Record<string, number | string>) => {
               let t = '';
               for (const k in res) {
@@ -157,6 +160,44 @@ export class QQMessageHandler {
             );
           } catch (e) {
             Logger.log('coc检定请求失败');
+            console.log(e);
+            return MakeMsg.plain(responseTranslator('internal-error'));
+          }
+        }
+        case '.dnd':
+        case '.dnd+': {
+          try {
+            const res = await this.req.request({
+              method: 'GET',
+              url: '/dnd',
+              qq: sender.qq,
+              params: { num: args[0] },
+            });
+
+            if (!res) {
+              throw new Error('dnd检定请求失败');
+            }
+            if (res.data.code !== 0) {
+              Logger.log('dnd检定请求失败');
+              console.log(res.data.message);
+              return MakeMsg.plain(
+                responseTranslator('param-error', res.data.message)
+              );
+            }
+
+            const { result } = res.data;
+            const text = result
+              .map(
+                (dndResult: { sum: number }[]) =>
+                  '[' + dndResult.map(({ sum }) => sum).join(', ') + ']'
+              )
+              .join('\n');
+
+            return MakeMsg.plain(
+              responseTranslator('dnd', sender.nickname, text)
+            );
+          } catch (e) {
+            Logger.log('dnd检定请求失败');
             console.log(e);
             return MakeMsg.plain(responseTranslator('internal-error'));
           }

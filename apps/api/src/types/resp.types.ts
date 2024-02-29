@@ -19,6 +19,13 @@ export type MyExpressionResult = ApiResult<ExpressionResult>;
 
 export type CocAttributeResult = ApiResult<Record<string, number>[]>;
 
+interface DndAttributeResultSingle {
+  sum: number;
+  dices: number[];
+}
+
+export type DndAttributeResult = ApiResult<DndAttributeResultSingle[][]>;
+
 export const isResultSuccess = (
   result: ApiResult
 ): result is ApiResultSuccess<unknown> => result.code === 0;
