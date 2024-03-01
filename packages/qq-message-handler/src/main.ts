@@ -8,6 +8,7 @@ import type {
 } from 'mirainya2';
 import { responseTranslator } from './response';
 import { MyRequest } from './requests';
+import { apiConfig } from '../config/api-config';
 
 export class QQMessageHandler {
   private req;
@@ -80,6 +81,36 @@ export class QQMessageHandler {
         }
         case '.jrrp': {
           try {
+            if (
+              ((new Date().getMonth() === 3 && new Date().getDate() === 1) ||
+                apiConfig.test.group.includes(sender.group!)) &&
+              args.length > 1
+            ) {
+              const val = args[0];
+              const res = await this.req.request({
+                method: 'POST',
+                url: '/jrrp',
+                qq: sender.qq,
+                data: { val },
+              });
+
+              if (!res) {
+                throw new Error('获取jrrp值失败');
+              }
+              const { match, include } = res.data.result;
+              if (match === 4) {
+                return MakeMsg.plain(
+                  responseTranslator('jrrp-af-success', sender.nickname, val)
+                );
+              } else {
+                const text =
+                  new Array(match).fill('●').join('') +
+                  new Array(include).fill('○').join('');
+                return MakeMsg.plain(
+                  responseTranslator('jrrp-af-fail', sender.nickname, text)
+                );
+              }
+            }
             const res = await this.req.request({
               method: 'GET',
               url: '/jrrp',
@@ -88,8 +119,18 @@ export class QQMessageHandler {
             if (!res) {
               throw new Error('获取jrrp值失败');
             }
+            if (res.data.result.jrrp < 0) {
+              return MakeMsg.plain(
+                responseTranslator('jrrp-af', sender.nickname, '░▒▓█')
+              );
+            }
             return MakeMsg.plain(
-              responseTranslator('jrrp', sender.nickname, res.data.result.jrrp)
+              responseTranslator(
+                'jrrp',
+                sender.nickname,
+                res.data.result.jrrp,
+                ''
+              )
             );
           } catch (e) {
             Logger.log('获取jrrp值失败');

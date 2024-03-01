@@ -28,18 +28,22 @@ export class ApiController {
   async getJrrp(@Req() req: MyRequest): Promise<JrrpResult> {
     try {
       const oldJrrp = await this.apiService.checkJrrp(req);
+      let val = 0,
+        got: 0 | 1 = 0;
       if (oldJrrp > 0) {
-        return {
-          code: 0,
-          result: { jrrp: oldJrrp, got: 1 },
-        };
+        val = oldJrrp;
+        got = 1;
       } else {
-        const result = this.apiService.newJrrp(req);
-        return {
-          code: 0,
-          result: { jrrp: await result, got: 0 },
-        };
+        const result = await this.apiService.newJrrp(req);
+        val = result;
       }
+      if (new Date().getMonth() === 3 && new Date().getDate() === 1) {
+        val = -1;
+      }
+      return {
+        code: 0,
+        result: { jrrp: val, got },
+      };
     } catch (error) {
       const err = new MyError(2001, 'internal', '数据库异常');
       MyError.log(err);
@@ -225,5 +229,64 @@ export class ApiController {
       };
       return resp;
     });
+  }
+
+  @Post('jrrp') // April Fool 2024 Only!
+  async setJrrp(@Req() req: MyRequest): Promise<ApiResult> {
+    const { val: rawVal } = req.body;
+    const val = Number(rawVal);
+
+    if (new Date().getMonth() !== 3 || new Date().getDate() !== 1) {
+      return { code: 1, message: '@deprecated' };
+    }
+    if (isNaN(val)) {
+      this.apiService.tryAF2024Record(req, rawVal, false);
+      return { code: 1002, message: '请填一个数字' };
+    }
+
+    if (val < 0 || val > 100) {
+      this.apiService.tryAF2024Record(req, rawVal, false);
+      return { code: 1002, message: '数字超过范围' };
+    }
+
+    const jrrp = await this.apiService.checkJrrp(req);
+    if (jrrp < 0) {
+      return { code: 1003, message: 'jrrp未生成' };
+    }
+
+    const ans = [
+      Math.floor(jrrp / 64),
+      Math.floor(jrrp / 16) % 4,
+      Math.floor(jrrp / 4) % 4,
+      jrrp % 4,
+    ]; // 四进制表示
+    const userVal = [
+      Math.floor(val / 64),
+      Math.floor(val / 16) % 4,
+      Math.floor(val / 4) % 4,
+      val % 4,
+    ];
+
+    let matchCount = 0,
+      includeCount = 0;
+    for (let i = 0; i < 4; i++) {
+      if (ans[i] === userVal[i]) {
+        matchCount++;
+        ans[i] = userVal[i] = -1;
+      }
+    }
+    for (let i = 0; i < 4; i++) {
+      if (userVal[i] >= 0 && ans.includes(userVal[i])) {
+        includeCount++;
+        ans[ans.indexOf(userVal[i])] = -1;
+      }
+    }
+
+    this.apiService.tryAF2024Record(req, rawVal, matchCount === 4);
+
+    return {
+      code: 0,
+      result: { match: matchCount, include: includeCount },
+    };
   }
 }

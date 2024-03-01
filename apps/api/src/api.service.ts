@@ -13,6 +13,7 @@ import {
   CocRuleBookCheck,
   isAttribute,
 } from './utils/cocRules';
+import { AF2024Record } from './entity/af2024.entity';
 
 @Injectable()
 export class ApiService {
@@ -265,5 +266,22 @@ export class ApiService {
     } catch (e) {
       throw new MyError(2001, 'internal', (e as Error).message);
     }
+  }
+
+  async tryAF2024Record(
+    req: MyRequest,
+    val: string,
+    success: boolean = false
+  ): Promise<void> {
+    const checkSuccess = await this.entityManager.findOne<AF2024Record>(
+      'af2024_record',
+      { where: { userId: req.userId, success: true } }
+    );
+
+    await this.entityManager.insert<AF2024Record>('af2024_record', {
+      userId: req.userId,
+      val,
+      success: success || !!checkSuccess,
+    });
   }
 }
