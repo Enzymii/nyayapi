@@ -10,6 +10,7 @@ import {
   MyExpressionResult,
 } from './types/resp.types';
 import { MyDiceExpression } from './utils/dice';
+import { randomSample } from './utils/choice';
 import { CocCheckResult, attributeDices, isAttribute } from './utils/cocRules';
 import { CocSkill } from './entity/coc/skill.entity';
 
@@ -165,6 +166,31 @@ export class ApiController {
         MyError.log(e as MyError);
         return { code: (e as MyError).code, message: (e as MyError).message };
       } else {
+        return { code: 2001, message: '数据库异常' };
+      }
+    }
+  }
+
+  @Get('choice')
+  async getChoice(@Req() req: MyRequest): Promise<ApiResult> {
+    const { options: o, count } = req.query;
+    try {
+      const options = (o as string).split(',');
+      const m = Number(count);
+      if (isNaN(m) || m <= 0 || m > options.length) {
+        throw new MyError(1002, 'api', '参数不合法');
+      }
+      const indices = options.map((_, i) => i);
+      const res = randomSample(indices, m);
+      this.apiService.saveChoiceRecord(req, options, res, m);
+      const result = options.filter((_, i) => res.includes(i));
+      return { code: 0, result };
+    } catch (e) {
+      if ((e as MyError).isCustomError) {
+        MyError.log(e as MyError);
+        return { code: (e as MyError).code, message: (e as MyError).message };
+      } else {
+        console.log(e);
         return { code: 2001, message: '数据库异常' };
       }
     }
