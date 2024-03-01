@@ -226,7 +226,7 @@ export class QQMessageHandler {
               method: 'GET',
               url: '/choice',
               qq: sender.qq,
-              data: { options: choices.join(','), count },
+              params: { options: choices.join(','), count },
             });
             if (!res) {
               throw new Error('选择请求失败');
