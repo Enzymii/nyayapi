@@ -89,7 +89,7 @@ export class QQMessageHandler {
               throw new Error('获取jrrp值失败');
             }
             return MakeMsg.plain(
-              responseTranslator('jrrp', sender.nickname, res.data.result.jrrp)
+              responseTranslator('jrrp', sender.nickname, res.data.result.jrrp, '')
             );
           } catch (e) {
             Logger.log('获取jrrp值失败');
