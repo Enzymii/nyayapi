@@ -28,7 +28,7 @@
     },
     {
       "name": "choice",
-      "content": "唔……$0要让$$来决定吗？那么，就这样选喵w：\n$1",
+      "content": "唔……$0要让$$来决定喵w？那么，就这样选喵w：\n$1",
       "params": ["username", "choice text"]
     },
     {
