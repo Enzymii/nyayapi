@@ -282,8 +282,6 @@ export class ApiService {
         const option = new MyOption();
         option.content = opt;
         option.chosen = indices.includes(i);
-        console.log(indices, i);
-        console.log(option.chosen);
         return option;
       });
 
