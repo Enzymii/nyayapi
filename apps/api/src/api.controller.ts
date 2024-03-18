@@ -27,6 +27,12 @@ export class ApiController {
   @Get('jrrp')
   async getJrrp(@Req() req: MyRequest): Promise<JrrpResult> {
     try {
+      const { test } = req.query;
+
+      if (test === '1') {
+        return { code: 0, result: { jrrp: -1, got: 0 } };
+      }
+
       const oldJrrp = await this.apiService.checkJrrp(req);
       let val = 0,
         got: 0 | 1 = 0;
@@ -233,10 +239,10 @@ export class ApiController {
 
   @Post('jrrp') // April Fool 2024 Only!
   async setJrrp(@Req() req: MyRequest): Promise<ApiResult> {
-    const { val: rawVal } = req.body;
+    const { val: rawVal, force } = req.body;
     const val = Number(rawVal);
 
-    if (new Date().getMonth() !== 3 || new Date().getDate() !== 1) {
+    if (!force && (new Date().getMonth() !== 3 || new Date().getDate() !== 1)) {
       return { code: 1, message: '@deprecated' };
     }
     if (isNaN(val)) {
@@ -282,11 +288,15 @@ export class ApiController {
       }
     }
 
-    this.apiService.tryAF2024Record(req, rawVal, matchCount === 4);
+    const success = this.apiService.tryAF2024Record(
+      req,
+      rawVal,
+      matchCount === 4
+    );
 
     return {
       code: 0,
-      result: { match: matchCount, include: includeCount },
+      result: { match: matchCount, include: includeCount, success },
     };
   }
 }

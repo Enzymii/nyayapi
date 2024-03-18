@@ -272,16 +272,20 @@ export class ApiService {
     req: MyRequest,
     val: string,
     success: boolean = false
-  ): Promise<void> {
+  ): Promise<boolean> {
     const checkSuccess = await this.entityManager.findOne<AF2024Record>(
       'af2024_record',
       { where: { userId: req.userId, success: true } }
     );
 
+    const result = !!checkSuccess;
+
     await this.entityManager.insert<AF2024Record>('af2024_record', {
       userId: req.userId,
       val,
-      success: success || !!checkSuccess,
+      success: success || result,
     });
+
+    return result;
   }
 }

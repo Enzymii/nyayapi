@@ -63,6 +63,8 @@ export class QQMessageHandler {
     msg: PlainMessage,
     sender: { qq: number; group?: number; nickname: string }
   ): Promise<Message | MessageChain | null> {
+    const isTestEnv = apiConfig.test.group.includes(sender.group!);
+
     // TODO: do something to text, should be returned by a MakeMsg function
     const { text } = msg;
     const text2 = text
@@ -83,7 +85,7 @@ export class QQMessageHandler {
           try {
             if (
               ((new Date().getMonth() === 3 && new Date().getDate() === 1) ||
-                apiConfig.test.group.includes(sender.group!)) &&
+                isTestEnv) &&
               args.length > 1
             ) {
               const val = args[0];
@@ -91,21 +93,22 @@ export class QQMessageHandler {
                 method: 'POST',
                 url: '/jrrp',
                 qq: sender.qq,
-                data: { val },
+                data: isTestEnv ? { val, force: true } : { val },
               });
 
               if (!res) {
                 throw new Error('获取jrrp值失败');
               }
-              const { match, include } = res.data.result;
-              if (match === 4) {
+              const { match, include, success } = res.data.result;
+              if (success) {
                 return MakeMsg.plain(
                   responseTranslator('jrrp-af-success', sender.nickname, val)
                 );
               } else {
                 const text =
                   new Array(match).fill('●').join('') +
-                  new Array(include).fill('○').join('');
+                  new Array(include).fill('◐').join('') +
+                  new Array(4 - match - include).fill('○').join('');
                 return MakeMsg.plain(
                   responseTranslator('jrrp-af-fail', sender.nickname, text)
                 );
@@ -115,6 +118,7 @@ export class QQMessageHandler {
               method: 'GET',
               url: '/jrrp',
               qq: sender.qq,
+              params: { test: isTestEnv ? 1 : 0 },
             });
             if (!res) {
               throw new Error('获取jrrp值失败');
