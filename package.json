@@ -6,6 +6,7 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
+    "start": "turbo run start",
     "lint:fix": "turbo run lint -- --fix",
     "lint:staged": "lint-staged",
     "doc": "turbo run doc",
