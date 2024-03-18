@@ -14,6 +14,8 @@ import {
   isAttribute,
 } from './utils/cocRules';
 import { AF2024Record } from './entity/af2024.entity';
+import { Choice } from './entity/choice/choice.entity';
+import { Option as MyOption } from './entity/choice/option.entity';
 
 @Injectable()
 export class ApiService {
@@ -287,5 +289,42 @@ export class ApiService {
     });
 
     return result;
+  }
+  
+  async saveChoiceRecord(
+    req: MyRequest,
+    options: string[],
+    indices: number[],
+    count: number
+  ): Promise<void> {
+    try {
+      const choice = new Choice();
+
+      const optionEntities = options.map((opt, i) => {
+        const option = new MyOption();
+        option.content = opt;
+        option.chosen = indices.includes(i);
+        return option;
+      });
+
+      choice.options = optionEntities;
+      choice.optionCount = options.length;
+      choice.choiceCount = count;
+      choice.userID = req.userId;
+
+      await this.entityManager.insert<Choice>('choice', choice);
+      optionEntities.forEach((opt) => {
+        opt.choice = choice;
+        this.entityManager.insert<MyOption>('option', opt);
+      });
+    } catch (err) {
+      MyError.log(
+        new MyError(
+          2001,
+          'internal',
+          '保存选择记录失败: ' + (err as Error).toString()
+        )
+      );
+    }
   }
 }

@@ -27,6 +27,11 @@
       "params": ["username", "dnd text"]
     },
     {
+      "name": "choice",
+      "content": "唔……$0要让$$来决定喵w？那么，就这样选喵w：\n$1",
+      "params": ["username", "choice text"]
+    },
+    {
       "name": "param-error",
       "content": "$$觉得这样不可以喵w：$0",
       "params": ["error message"]

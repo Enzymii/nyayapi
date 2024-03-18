@@ -247,6 +247,50 @@ export class QQMessageHandler {
             return MakeMsg.plain(responseTranslator('internal-error'));
           }
         }
+        case '.choice': {
+          let choices, count;
+          if (isNaN(Number(args[0]))) {
+            choices = args;
+            count = 1;
+          } else {
+            count = Number(args[0]);
+            choices = args.slice(1);
+          }
+          if (choices.length < 2) {
+            return MakeMsg.plain(
+              responseTranslator('param-error', '请至少给出两个选项')
+            );
+          }
+          try {
+            const res = await this.req.request({
+              method: 'GET',
+              url: '/choice',
+              qq: sender.qq,
+              params: { options: choices.join(','), count },
+            });
+            if (!res) {
+              throw new Error('选择请求失败');
+            }
+            if (res.data.code !== 0) {
+              Logger.log('选择请求失败');
+              console.log(res.data.message);
+              return MakeMsg.plain(
+                responseTranslator('internal-error', res.data.message)
+              );
+            }
+            return MakeMsg.plain(
+              responseTranslator(
+                'choice',
+                sender.nickname,
+                res.data.result.join(', ')
+              )
+            );
+          } catch (e) {
+            Logger.log('选择请求失败');
+            console.log(e);
+            return MakeMsg.plain(responseTranslator('internal-error'));
+          }
+        }
         default:
           Logger.log('未知的指令：' + order);
       }
