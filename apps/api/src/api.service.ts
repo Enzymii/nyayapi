@@ -280,7 +280,7 @@ export class ApiService {
       { where: { userId: req.userId, success: true } }
     );
 
-    const result = !!checkSuccess;
+    const result = !!checkSuccess?.id;
 
     await this.entityManager.insert<AF2024Record>('af2024_record', {
       userId: req.userId,

@@ -42,17 +42,22 @@
     },
     {
       "name": "jrrp-af",
-      "content": "$$觉得$0的今日人品为$1喵w~呜呜，好像结果被吃掉了喵w~或许可以猜一下喵w？",
+      "content": "$$觉得$0的今日人品为$1喵w~呜呜，好像结果被吃掉了喵w~或许可以帮沫纯找一下喵w~",
       "params": ["username", "jrrp-mask"]
     },
     {
+      "name": "jrrp-af-error",
+      "content": "$0的尝试好像没有生效喵w~$$认为原因是$1喵w~",
+      "params": ["username", "error message"]
+    },
+    {
       "name": "jrrp-af-fail",
-      "content": "$$觉得$0的今日人品为$1喵w~唔，好像不太对喵w~或许可以再猜一次喵w？",
+      "content": "$$觉得$0的今日人品为$1喵w~唔，好像不太对喵w~或许可以再试试喵w~",
       "params": ["username", "jrrp-result"]
     },
     {
       "name": "jrrp-af-ok",
-      "content": "$$觉得$0的今日人品为$1喵w~哇，找到结果了喵w~你真棒喵w~",
+      "content": "$$觉得$0的今日人品为$1喵w~哇，原来结果是这样喵w~你真棒喵w~",
       "params": ["username", "jrrp-result"]
     }
   ]

@@ -30,10 +30,6 @@ export class ApiController {
     try {
       const { test } = req.query;
 
-      if (test === '1') {
-        return { code: 0, result: { jrrp: -1, got: 0 } };
-      }
-
       const oldJrrp = await this.apiService.checkJrrp(req);
       let val = 0,
         got: 0 | 1 = 0;
@@ -44,7 +40,7 @@ export class ApiController {
         const result = await this.apiService.newJrrp(req);
         val = result;
       }
-      if (new Date().getMonth() === 3 && new Date().getDate() === 1) {
+      if ((new Date().getMonth() === 3 && new Date().getDate() === 1) || Number(test) === 1) {
         val = -1;
       }
       return {
@@ -273,7 +269,7 @@ export class ApiController {
     }
     if (isNaN(val)) {
       this.apiService.tryAF2024Record(req, rawVal, false);
-      return { code: 1002, message: '请填一个数字' };
+      return { code: 1002, message: '不是一个数字' };
     }
 
     if (val < 0 || val > 100) {
@@ -322,7 +318,7 @@ export class ApiController {
 
     return {
       code: 0,
-      result: { match: matchCount, include: includeCount, success },
+      result: { match: matchCount, include: includeCount, success: !!success },
     };
   }
 }

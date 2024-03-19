@@ -86,7 +86,7 @@ export class QQMessageHandler {
             if (
               ((new Date().getMonth() === 3 && new Date().getDate() === 1) ||
                 isTestEnv) &&
-              args.length > 1
+              args.length >= 1
             ) {
               const val = args[0];
               const res = await this.req.request({
@@ -99,10 +99,21 @@ export class QQMessageHandler {
               if (!res) {
                 throw new Error('获取jrrp值失败');
               }
+              if (res.data.code !== 0) {
+                Logger.log('获取jrrp值失败');
+                console.log(res.data.message);
+                return MakeMsg.plain(
+                  responseTranslator(
+                    'jrrp-af-error',
+                    sender.nickname,
+                    res.data.message
+                  )
+                );
+              }
               const { match, include, success } = res.data.result;
               if (success) {
                 return MakeMsg.plain(
-                  responseTranslator('jrrp-af-success', sender.nickname, val)
+                  responseTranslator('jrrp-af-ok', sender.nickname, val)
                 );
               } else {
                 const text =
