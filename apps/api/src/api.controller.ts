@@ -44,7 +44,7 @@ export class ApiController {
         (new Date().getMonth() === 3 && new Date().getDate() === 1) ||
         Number(test) === 1
       ) {
-        if (!await this.apiService.checkAF2024Record(req)) {
+        if (!(await this.apiService.checkAF2024Record(req))) {
           val = -1;
         }
       }
@@ -269,9 +269,21 @@ export class ApiController {
     const { val: rawVal, force } = req.body;
     const val = Number(rawVal);
 
+    const hasSuccess = await this.apiService.checkAF2024Record(req);
+
     if (!force && (new Date().getMonth() !== 3 || new Date().getDate() !== 1)) {
       return { code: 1, message: '@deprecated' };
     }
+
+    const jrrp = await this.apiService.checkJrrp(req);
+    if (jrrp < 0) {
+      return { code: 1003, message: 'jrrp未生成' };
+    }
+
+    if (hasSuccess) {
+      return { code: 0, result: { success: jrrp } };
+    }
+
     if (isNaN(val)) {
       this.apiService.tryAF2024Record(req, rawVal, false);
       return { code: 1002, message: '不是一个数字' };
@@ -280,11 +292,6 @@ export class ApiController {
     if (val < 0 || val > 100) {
       this.apiService.tryAF2024Record(req, rawVal, false);
       return { code: 1002, message: '数字超过范围' };
-    }
-
-    const jrrp = await this.apiService.checkJrrp(req);
-    if (jrrp < 0) {
-      return { code: 1003, message: 'jrrp未生成' };
     }
 
     const ans = [
@@ -323,7 +330,11 @@ export class ApiController {
 
     return {
       code: 0,
-      result: { match: matchCount, include: includeCount, success: success ? jrrp : -1 },
+      result: {
+        match: matchCount,
+        include: includeCount,
+        success: success ? jrrp : -1,
+      },
     };
   }
 }
