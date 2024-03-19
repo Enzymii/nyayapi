@@ -40,8 +40,13 @@ export class ApiController {
         const result = await this.apiService.newJrrp(req);
         val = result;
       }
-      if ((new Date().getMonth() === 3 && new Date().getDate() === 1) || Number(test) === 1) {
-        val = -1;
+      if (
+        (new Date().getMonth() === 3 && new Date().getDate() === 1) ||
+        Number(test) === 1
+      ) {
+        if (!await this.apiService.checkAF2024Record(req)) {
+          val = -1;
+        }
       }
       return {
         code: 0,
@@ -310,7 +315,7 @@ export class ApiController {
       }
     }
 
-    const success = this.apiService.tryAF2024Record(
+    const success = await this.apiService.tryAF2024Record(
       req,
       rawVal,
       matchCount === 4
@@ -318,7 +323,7 @@ export class ApiController {
 
     return {
       code: 0,
-      result: { match: matchCount, include: includeCount, success: !!success },
+      result: { match: matchCount, include: includeCount, success: success ? jrrp : -1 },
     };
   }
 }

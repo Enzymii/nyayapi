@@ -111,7 +111,17 @@ export class QQMessageHandler {
                 );
               }
               const { match, include, success } = res.data.result;
-              if (success) {
+              if (success > 0) {
+                return MakeMsg.plain(
+                  responseTranslator(
+                    'jrrp',
+                    sender.nickname,
+                    res.data.result.success,
+                    ''
+                  )
+                );
+              }
+              if (match === 4) {
                 return MakeMsg.plain(
                   responseTranslator('jrrp-af-ok', sender.nickname, val)
                 );

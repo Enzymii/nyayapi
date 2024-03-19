@@ -270,25 +270,29 @@ export class ApiService {
     }
   }
 
-  async tryAF2024Record(
-    req: MyRequest,
-    val: string,
-    success: boolean = false
-  ): Promise<boolean> {
+  async checkAF2024Record(req: MyRequest): Promise<boolean> {
     const checkSuccess = await this.entityManager.findOne<AF2024Record>(
       'af2024_record',
       { where: { userId: req.userId, success: true } }
     );
 
-    const result = !!checkSuccess?.id;
+    return !!checkSuccess?.id;
+  }
+
+  async tryAF2024Record(
+    req: MyRequest,
+    val: string,
+    success: boolean = false
+  ): Promise<boolean> {
+    const checkSuccess = await this.checkAF2024Record(req);
 
     await this.entityManager.insert<AF2024Record>('af2024_record', {
       userId: req.userId,
       val,
-      success: success || result,
+      success: success || checkSuccess,
     });
 
-    return result;
+    return checkSuccess;
   }
   
   async saveChoiceRecord(
