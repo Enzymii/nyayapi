@@ -1,0 +1,22 @@
+.inputBox {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: flex-start;
+}
+
+.textFieldName {
+  width: 30%;
+}
+
+.bindQQRow {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.okButton {
+  margin-top: 40px;
+  width: 200px;
+}
