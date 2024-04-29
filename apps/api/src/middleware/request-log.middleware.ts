@@ -43,7 +43,8 @@ export class RequestLoggerMiddleware implements NestMiddleware {
       if (from) {
         const parsed = Buffer.from(from as string, 'base64').toString('utf8');
 
-        if (!/\d+@qq/.test(parsed)) {
+        if (!/^(\d+@qq)|(\w+@webui)$/.test(parsed)) {
+          console.log(parsed);
           throw new MyError(1001, 'api', '无效的 from 参数');
         }
 

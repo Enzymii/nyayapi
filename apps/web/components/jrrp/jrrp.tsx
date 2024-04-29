@@ -3,8 +3,11 @@ import { useState } from 'react';
 import PageComponentBase from '../PageComponentBase/PageComponentBase';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 
 import styles from './jrrp.module.css';
+import myRequest from '../../request';
+import { useBindQQContext } from '../../context/context';
 
 export function JrrpPage() {
   interface TextFieldStatus {
@@ -18,20 +21,43 @@ export function JrrpPage() {
     } | null;
   }
 
+  const [qq] = useBindQQContext();
+
   const [nickname, setNickname] = useState<string>('');
   const [textFieldStatus, setTextFieldStatus] = useState<TextFieldStatus>({
     nickname: null,
     qq: null,
   });
 
-  const handleSubmit = () => {
+  const [jrrp, setJrrp] = useState<number | null>(null);
+
+  const handleSubmit = async () => {
     setTextFieldStatus({ nickname: null, qq: null });
+    setJrrp(null);
 
     if (nickname === '') {
       setTextFieldStatus((prev) => ({
         ...prev,
         nickname: { text: '请告诉沫纯你是谁喵w~', error: true },
       }));
+      return;
+    }
+
+    try {
+      const fromString = qq.qq ? `${qq.qq}@qq` : `${nickname}@webui`;
+      const b64FromString = Buffer.from(fromString).toString('base64');
+
+      const req = await myRequest.requestToProxy({
+        path: 'jrrp',
+        method: 'GET',
+        params: {
+          from: b64FromString,
+        },
+      });
+
+      setJrrp(req.data.result.jrrp);
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -59,6 +85,13 @@ export function JrrpPage() {
           确认
         </Button>
       </div>
+      {jrrp !== null && (
+        <div className={styles.result}>
+          <Typography variant="body1">
+            沫纯猜测{nickname}的今日人品值为{jrrp}喵w~
+          </Typography>
+        </div>
+      )}
     </PageComponentBase>
   );
 }
