@@ -1,0 +1,44 @@
+.header {
+  padding: 20px 40px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+}
+
+.dialogContent {
+  min-width: 400px;
+  min-height: 240px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.input,
+.slider {
+  width: 80%;
+}
+
+.linker {
+  color: #1976d2;
+  text-decoration: underline;
+}
+
+.error {
+  color: red;
+}
+
+.preview {
+  display: flex;
+  align-items: center;
+}
+
+.nickname {
+  margin: 0 20px !important;
+}

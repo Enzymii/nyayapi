@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Tabs from '@mui/material/Tabs';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import { JrrpPage } from '../components/jrrp/jrrp';
-import { BindQQ } from '../components/bindQQ/BindQQ';
-import { BindQQContextProvider } from '../context/context';
+import { Header } from '../components/header/header';
+import { useUserContext } from '../context/context';
 import Footer from '../components/footer/footer';
 
 import styles from './page.module.css';
@@ -42,35 +42,38 @@ function a11yProps(index: number) {
 
 export default function Page() {
   const [value, setValue] = useState(0);
+  const [, dispatch] = useUserContext();
+  useEffect(() => {
+    const randString = Math.random().toString(36).substring(5);
+    dispatch({ type: 'setNickname', nickname: '未命名喵' + randString });
+  }, []);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
   return (
-    <BindQQContextProvider>
-      <div className={styles.body}>
-        <div className={styles.content}>
-          <BindQQ />
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs
-              value={value}
-              onChange={handleChange}
-              aria-label="basic tabs example"
-            >
-              <Tab label=".jrrp" {...a11yProps(0)} />
-              <Tab label=".r" {...a11yProps(1)} />
-              <Tab label=".coc" {...a11yProps(2)} />
-              <Tab label=".dnd" {...a11yProps(3)} />
-              <Tab label=".choice" {...a11yProps(4)} />
-            </Tabs>
-          </Box>
-          <CustomTabPanel value={value} index={0}>
-            <JrrpPage />
-          </CustomTabPanel>
-        </div>
-        <Footer className={styles.footer} />
+    <div className={styles.body}>
+      <div className={styles.content}>
+        <Header />
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            aria-label="basic tabs example"
+          >
+            <Tab label=".jrrp" {...a11yProps(0)} />
+            <Tab label=".r" {...a11yProps(1)} />
+            <Tab label=".coc" {...a11yProps(2)} />
+            <Tab label=".dnd" {...a11yProps(3)} />
+            <Tab label=".choice" {...a11yProps(4)} />
+          </Tabs>
+        </Box>
+        <CustomTabPanel value={value} index={0}>
+          <JrrpPage />
+        </CustomTabPanel>
       </div>
-    </BindQQContextProvider>
+      <Footer className={styles.footer} />
+    </div>
   );
 }

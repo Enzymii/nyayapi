@@ -1,6 +1,7 @@
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
 
 import './global.css';
+import GlobalContextProvider from './globalContextProvider';
 
 export default function RootLayout({
   children,
@@ -10,7 +11,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AppRouterCacheProvider>{children}</AppRouterCacheProvider>
+        <AppRouterCacheProvider>
+          <GlobalContextProvider>{children}</GlobalContextProvider>
+        </AppRouterCacheProvider>
       </body>
     </html>
   );
