@@ -1,9 +1,9 @@
 import axios from 'axios';
-import config from './config/config';
+// import config from './config/config';
 
 class MyRequest {
   axiosInstance = axios.create({
-    baseURL: `http://${config.host}:${config.port}/${config.path}`,
+    baseURL: '/api',
     timeout: 10000,
     headers: {
       'Content-Type': 'application/json',

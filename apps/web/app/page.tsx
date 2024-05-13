@@ -7,6 +7,9 @@ import Tab from '@mui/material/Tab';
 import { JrrpPage } from '../components/jrrp/jrrp';
 import { BindQQ } from '../components/bindQQ/BindQQ';
 import { BindQQContextProvider } from '../context/context';
+import Footer from '../components/footer/footer';
+
+import styles from './page.module.css';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -46,29 +49,28 @@ export default function Page() {
 
   return (
     <BindQQContextProvider>
-      <BindQQ />
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          aria-label="basic tabs example"
-        >
-          <Tab label=".jrrp" {...a11yProps(0)} />
-          <Tab label=".r" {...a11yProps(1)} />
-          <Tab label=".coc" {...a11yProps(2)} />
-          <Tab label=".dnd" {...a11yProps(3)} />
-          <Tab label=".choice" {...a11yProps(4)} />
-        </Tabs>
-      </Box>
-      <CustomTabPanel value={value} index={0}>
-        <JrrpPage />
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={1}>
-        Item Two
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={2}>
-        Item Three
-      </CustomTabPanel>
+      <div className={styles.body}>
+        <div className={styles.content}>
+          <BindQQ />
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs
+              value={value}
+              onChange={handleChange}
+              aria-label="basic tabs example"
+            >
+              <Tab label=".jrrp" {...a11yProps(0)} />
+              <Tab label=".r" {...a11yProps(1)} />
+              <Tab label=".coc" {...a11yProps(2)} />
+              <Tab label=".dnd" {...a11yProps(3)} />
+              <Tab label=".choice" {...a11yProps(4)} />
+            </Tabs>
+          </Box>
+          <CustomTabPanel value={value} index={0}>
+            <JrrpPage />
+          </CustomTabPanel>
+        </div>
+        <Footer className={styles.footer} />
+      </div>
     </BindQQContextProvider>
   );
 }
