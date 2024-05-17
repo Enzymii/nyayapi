@@ -51,7 +51,7 @@ export default function SetQQDialog() {
   const handleSubmit = () => {
     setInputError('');
     const qqStr = qq.toString();
-    if (qqStr.length < 5 || qqStr.length > 11) {
+    if (!/^\d{5,11}$/.test(qqStr)) {
       setInputError('沫纯不觉得有这种QQ号喵w~');
       return;
     }

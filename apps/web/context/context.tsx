@@ -4,7 +4,7 @@ type UserContext = {
   nickname: string;
   bindQQ: boolean;
   qq?: string;
-  readonly getFromString: () => string;
+  readonly getFromString: (b?: boolean) => string;
 };
 
 type UserAction =
@@ -15,12 +15,11 @@ type UserAction =
 const initialContext: UserContext = {
   nickname: '',
   bindQQ: false,
-  getFromString() {
-    if (this.bindQQ && this.qq) {
-      return `${this.qq}@qq`;
-    } else {
-      return `${this.nickname}@webui`;
-    }
+  getFromString(b: boolean = true) {
+    const { bindQQ, qq, nickname } = this;
+    const str = bindQQ && qq ? `${qq}@qq` : `${nickname}@webui`;
+
+    return b ? Buffer.from(str).toString('base64') : str;
   },
 };
 

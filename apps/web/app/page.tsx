@@ -10,6 +10,8 @@ import { useUserContext } from '../context/context';
 import Footer from '../components/footer/footer';
 
 import styles from './page.module.css';
+import { CocPage } from '../components/coc/coc';
+import { useSearchParams } from 'next/navigation';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -40,9 +42,23 @@ function a11yProps(index: number) {
   };
 }
 
+const tabNames = ['jrrp', 'r', 'coc', 'dnd', 'choice'];
+
 export default function Page() {
   const [value, setValue] = useState(0);
   const [, dispatch] = useUserContext();
+  const query = useSearchParams();
+
+  useEffect(() => {
+    const tabQueryParam = query.get('tab') as string;
+    if (tabQueryParam) {
+      const tabIndex = tabNames.indexOf(tabQueryParam);
+      if (tabIndex >= 0) {
+        setValue(tabIndex);
+      }
+    }
+  }, [query]);
+
   useEffect(() => {
     const nickname = localStorage.getItem('nickname');
     if (nickname) {
@@ -52,7 +68,6 @@ export default function Page() {
       dispatch({ type: 'setNickname', nickname: '未命名喵' + randString });
     }
     const qq = localStorage.getItem('qq');
-    console.log('qq', qq);
     if (qq) {
       dispatch({ type: 'setQQ', qq });
     }
@@ -61,6 +76,10 @@ export default function Page() {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  const TabList = tabNames.map((name, index) => (
+    <Tab label={`.${name}`} {...a11yProps(index)} key={name} />
+  ));
 
   return (
     <div className={styles.body}>
@@ -72,15 +91,14 @@ export default function Page() {
             onChange={handleChange}
             aria-label="basic tabs example"
           >
-            <Tab label=".jrrp" {...a11yProps(0)} />
-            <Tab label=".r" {...a11yProps(1)} />
-            <Tab label=".coc" {...a11yProps(2)} />
-            <Tab label=".dnd" {...a11yProps(3)} />
-            <Tab label=".choice" {...a11yProps(4)} />
+            {TabList}
           </Tabs>
         </Box>
         <CustomTabPanel value={value} index={0}>
           <JrrpPage />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={2}>
+          <CocPage />
         </CustomTabPanel>
       </div>
       <Footer className={styles.footer} />

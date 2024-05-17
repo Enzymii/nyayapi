@@ -17,15 +17,11 @@ export function JrrpPage() {
     setJrrp(null);
 
     try {
-      const fromString = user.getFromString();
-      console.log(user);
-      const b64FromString = Buffer.from(fromString).toString('base64');
-
       const req = await myRequest.requestToProxy({
         path: 'jrrp',
         method: 'GET',
         params: {
-          from: b64FromString,
+          from: user.getFromString(),
         },
       });
 

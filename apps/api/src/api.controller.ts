@@ -73,7 +73,7 @@ export class ApiController {
     const { num } = req.query;
 
     try {
-      if ((num && isNaN(Number(num))) || Number(num) > 5) {
+      if ((num && isNaN(Number(num))) || Number(num) > 10) {
         throw new MyError(1002, 'api', '生成的属性数不合法');
       }
 
@@ -110,7 +110,7 @@ export class ApiController {
     const { num } = req.query;
 
     try {
-      if ((num && isNaN(Number(num))) || Number(num) > 5) {
+      if ((num && isNaN(Number(num))) || Number(num) > 10) {
         throw new MyError(1002, 'api', '生成的属性数不合法');
       }
 
