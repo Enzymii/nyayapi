@@ -17,6 +17,9 @@ export const Header: React.FC = () => {
   const [nicknameOnEdit, setNicknameOnEdit] = React.useState<boolean>(false);
   const [newNickname, setNewNickname] = React.useState<string>('');
 
+  const [rememberNickname, setRememberNickname] =
+    React.useState<boolean>(false);
+
   useEffect(() => {
     setNewNickname(user.nickname);
   }, [user.nickname]);
@@ -29,7 +32,11 @@ export const Header: React.FC = () => {
     dispatch({ type: 'setNickname', nickname: newNickname });
 
     // 保存到本地
-    localStorage.setItem('nickname', newNickname);
+    if (rememberNickname) {
+      localStorage.setItem('nickname', newNickname);
+    } else {
+      localStorage.removeItem('nickname');
+    }
 
     setNicknameOnEdit(false);
   };
@@ -52,10 +59,11 @@ export const Header: React.FC = () => {
               onChange={(e) => setNewNickname(e.target.value)}
             />
             <Button onClick={handleSubmitNicknameEdit}>修改</Button>
-            <Checkbox disabled />
-            <Typography variant="body2" title="记不住一点喵w~">
-              让沫纯记住你的名字喵w~
-            </Typography>
+            <Checkbox
+              value={rememberNickname}
+              onChange={(e) => setRememberNickname(e.target.checked)}
+            />
+            <Typography variant="body2">让沫纯记住你的名字喵w~</Typography>
           </>
         )}
       </div>

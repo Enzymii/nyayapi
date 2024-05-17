@@ -1,12 +1,12 @@
 import { useState } from 'react';
 
 import PageComponentBase from '../PageComponentBase/PageComponentBase';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 import styles from './jrrp.module.css';
 import myRequest from '../../request';
 import { useUserContext } from '../../context/context';
+import DebounceButton from '../DebounceButton/DebounceButton';
 
 export function JrrpPage() {
   const [user] = useUserContext();
@@ -37,13 +37,14 @@ export function JrrpPage() {
 
   return (
     <PageComponentBase>
-      <Button
+      <DebounceButton
         className={styles.okButton}
+        debounceTime={3000}
         variant="contained"
         onClick={handleSubmit}
       >
         点这里喵w~
-      </Button>
+      </DebounceButton>
       {jrrp !== null && (
         <div className={styles.result}>
           <Typography variant="body1">

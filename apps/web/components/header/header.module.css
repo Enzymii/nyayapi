@@ -42,3 +42,8 @@
 .nickname {
   margin: 0 20px !important;
 }
+
+.remember {
+  display: flex;
+  align-items: center;
+}

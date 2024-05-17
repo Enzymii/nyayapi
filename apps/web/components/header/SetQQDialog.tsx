@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useUserContext } from '../../context/context';
 
 import Avatar from '@mui/material/Avatar';
@@ -13,6 +13,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Slider from '@mui/material/Slider';
 import Button from '@mui/material/Button';
+import CheckBox from '@mui/material/Checkbox';
 
 export default function SetQQDialog() {
   const [user, dispatch] = useUserContext();
@@ -21,6 +22,12 @@ export default function SetQQDialog() {
   const [inputIsTextField, setInputIsTextField] = useState(true);
   const [qq, setQQ] = useState('');
   const [inputError, setInputError] = useState('');
+
+  const [rememberQQ, setRememberQQ] = useState(false);
+
+  useEffect(() => {
+    setQQ(user.qq);
+  }, [user.qq]);
 
   const getQQAvatar = (qq: string, alwaysFetch = true) =>
     alwaysFetch && qq && qq.length > 0
@@ -49,6 +56,12 @@ export default function SetQQDialog() {
 
     // TODO: 保存到一些状态里
     dispatch({ type: 'setQQ', qq: qqStr });
+
+    if (rememberQQ) {
+      localStorage.setItem('qq', qqStr);
+    } else {
+      localStorage.removeItem('qq');
+    }
 
     setOpen(false);
   };
@@ -136,6 +149,13 @@ export default function SetQQDialog() {
               {inputError}
             </Typography>
           ) : null}
+          <div className={styles.remember}>
+            <CheckBox
+              value={rememberQQ}
+              onChange={(e) => setRememberQQ(e.target.checked)}
+            />
+            <Typography variant="body2">让沫纯记住你的QQ喵w~</Typography>
+          </div>
           <Button
             variant="contained"
             className={styles.confirmButton}

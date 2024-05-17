@@ -44,9 +44,19 @@ export default function Page() {
   const [value, setValue] = useState(0);
   const [, dispatch] = useUserContext();
   useEffect(() => {
-    const randString = Math.random().toString(36).substring(5);
-    dispatch({ type: 'setNickname', nickname: '未命名喵' + randString });
-  }, []);
+    const nickname = localStorage.getItem('nickname');
+    if (nickname) {
+      dispatch({ type: 'setNickname', nickname });
+    } else {
+      const randString = Math.random().toString(36).substring(5);
+      dispatch({ type: 'setNickname', nickname: '未命名喵' + randString });
+    }
+    const qq = localStorage.getItem('qq');
+    console.log('qq', qq);
+    if (qq) {
+      dispatch({ type: 'setQQ', qq });
+    }
+  }, [dispatch]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);

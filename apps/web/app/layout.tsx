@@ -10,6 +10,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <title key="title">是沫纯喵w~</title>
+      </head>
       <body>
         <AppRouterCacheProvider>
           <GlobalContextProvider>{children}</GlobalContextProvider>
