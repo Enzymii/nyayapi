@@ -21,7 +21,9 @@ export const Header: React.FC = () => {
     React.useState<boolean>(false);
 
   useEffect(() => {
-    setNewNickname(user.nickname);
+    if (user.nickname) {
+      setNewNickname(user.nickname);
+    }
   }, [user.nickname]);
 
   const handleClickEdit = () => {

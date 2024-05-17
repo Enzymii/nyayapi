@@ -26,7 +26,9 @@ export default function SetQQDialog() {
   const [rememberQQ, setRememberQQ] = useState(false);
 
   useEffect(() => {
-    setQQ(user.qq);
+    if (user.qq) {
+      setQQ(user.qq);
+    }
   }, [user.qq]);
 
   const getQQAvatar = (qq: string, alwaysFetch = true) =>
@@ -39,7 +41,7 @@ export default function SetQQDialog() {
   const avatarSrc = getQQAvatar(user.qq, user.bindQQ);
 
   const handleClickAvatar = () => {
-    if (qq.length === 0) {
+    if (!qq || qq.length === 0) {
       dispatch({ type: 'unbindQQ' });
     }
 
