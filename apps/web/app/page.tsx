@@ -11,7 +11,6 @@ import Footer from '../components/footer/footer';
 
 import styles from './page.module.css';
 import { CocPage } from '../components/coc/coc';
-import { useSearchParams } from 'next/navigation';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -47,17 +46,18 @@ const tabNames = ['jrrp', 'r', 'coc', 'dnd', 'choice'];
 export default function Page() {
   const [value, setValue] = useState(0);
   const [, dispatch] = useUserContext();
-  const query = useSearchParams();
 
   useEffect(() => {
-    const tabQueryParam = query.get('tab') as string;
+    const tabQueryParam = new URLSearchParams(window.location.search).get(
+      'tab'
+    ) as string;
     if (tabQueryParam) {
       const tabIndex = tabNames.indexOf(tabQueryParam);
       if (tabIndex >= 0) {
         setValue(tabIndex);
       }
     }
-  }, [query]);
+  }, []);
 
   useEffect(() => {
     const nickname = localStorage.getItem('nickname');
